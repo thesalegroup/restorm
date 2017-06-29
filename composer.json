@@ -1,0 +1,13 @@
+{
+    "name": "robwasripped/restorm",
+    "description": "REST ORM",
+    "authors": [
+        {
+            "name": "Robert Treacy",
+            "email": "email@roberttreacy.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0"
+    }
+}
