@@ -1,6 +1,7 @@
 {
     "name": "robwasripped/restorm",
     "description": "REST ORM",
+    "license": "MIT",
     "authors": [
         {
             "name": "Robert Treacy",
