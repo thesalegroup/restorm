@@ -44,7 +44,7 @@ class EntityManager
      */
     protected $entityMappingRegister;
 
-    function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister)
+    public function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister)
     {
         $this->repositoryRegister = $repositoryRegister;
         $this->entityMappingRegister = $entityMappingRegister;
