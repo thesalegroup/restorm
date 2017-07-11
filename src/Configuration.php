@@ -26,26 +26,11 @@
 namespace Robwasripped\Restorm;
 
 /**
- * Description of Repository
+ * Description of Configuration
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Repository implements RepositoryInterface
+class Configuration
 {
-    protected $name;
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function get()
-    {
-        ;
-    }
-
-    public function getOne()
-    {
-        ;
-    }
+    
 }

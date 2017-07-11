@@ -25,27 +25,27 @@
 
 namespace Robwasripped\Restorm;
 
+use GuzzleHttp\Client;
+
 /**
- * Description of Repository
+ * Description of Connection
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Repository implements RepositoryInterface
+class Connection
 {
-    protected $name;
-
-    public function getName(): string
+    public function setHost($host)
     {
-        return $this->name;
+        
     }
 
-    public function get()
+    public function setPort(int $port)
     {
-        ;
+        
     }
 
-    public function getOne()
+    public function setPath(string $path)
     {
-        ;
+
     }
 }

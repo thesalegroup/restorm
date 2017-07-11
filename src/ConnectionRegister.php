@@ -26,26 +26,16 @@
 namespace Robwasripped\Restorm;
 
 /**
- * Description of Repository
+ * Description of ConnectionManager
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Repository implements RepositoryInterface
+class ConnectionRegister
 {
-    protected $name;
-
-    public function getName(): string
+    private $connections = array();
+    
+    public function registerConnection(string $connectionName, array $connectionConfig)
     {
-        return $this->name;
-    }
-
-    public function get()
-    {
-        ;
-    }
-
-    public function getOne()
-    {
-        ;
+        
     }
 }

@@ -44,10 +44,17 @@ class EntityManager
      */
     protected $entityMappingRegister;
 
-    public function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister)
+    /**
+     *
+     * @var ConnectionRegister
+     */
+    protected $connectionRegister;
+
+    public function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
     {
         $this->repositoryRegister = $repositoryRegister;
         $this->entityMappingRegister = $entityMappingRegister;
+        $this->connectionRegister = $connectionRegister;
     }
 
     public function getRepository(string $entityClass): Repository
