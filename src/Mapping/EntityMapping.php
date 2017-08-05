@@ -36,12 +36,12 @@ class EntityMapping
         $this->properties = $properties;
     }
 
-    function getEntityClass()
+    public function getEntityClass()
     {
         return $this->entityClass;
     }
 
-    function getRepositoryName(): string
+    public function getRepositoryName(): string
     {
         return $this->repositoryName;
     }

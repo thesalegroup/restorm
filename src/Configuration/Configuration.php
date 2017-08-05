@@ -71,7 +71,7 @@ class Configuration
         $this->initialise();
     }
 
-    public static function BuildFromYaml(string $filePath)
+    public static function buildFromYaml(string $filePath)
     {
         if (!file_exists($filePath)) {
             throw new \Exception(sprintf('The configuration file "%s" cannot be found.',
@@ -96,12 +96,12 @@ class Configuration
         return $this->repositoryRegister;
     }
 
-    function getEntityMappingRegister(): EntityMappingRegister
+    public function getEntityMappingRegister(): EntityMappingRegister
     {
         return $this->entityMappingRegister;
     }
 
-    function getConnectionRegister(): ConnectionRegister
+    public function getConnectionRegister(): ConnectionRegister
     {
         return $this->connectionRegister;
     }
