@@ -34,7 +34,7 @@ class RepositoryRegister
 {
     private $repositories = array();
 
-    public function addRepository(Repository $repository): void
+    public function addRepository(Repository $repository)
     {
         $this->repositories[$repository->getName()] = $repository;
     }

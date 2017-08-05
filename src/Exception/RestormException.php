@@ -23,16 +23,12 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace Robwasripped\Restorm\Exception;
 
 /**
- * Description of EntityMappingRegister
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class EntityMappingRegister
+interface RestormException
 {
-    public function getEntityMapping(string $entityClass)
-    {
-    }
 }

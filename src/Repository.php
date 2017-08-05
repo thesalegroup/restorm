@@ -33,6 +33,13 @@ namespace Robwasripped\Restorm;
 class Repository implements RepositoryInterface
 {
     protected $name;
+    protected $options;
+
+    public function __construct(string $name, array $options)
+    {
+        $this->name = $name;
+        $this->options = $options;
+    }
 
     public function getName(): string
     {

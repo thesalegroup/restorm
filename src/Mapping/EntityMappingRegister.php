@@ -23,14 +23,33 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace Robwasripped\Restorm\Mapping;
 
 /**
- * Description of Configuration
+ * Description of EntityMappingRegister
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Configuration
+class EntityMappingRegister
 {
-    
+    /**
+     * @var EntityMapping[]
+     */
+    private $entityMappings;
+
+    public function addEntityMapping(EntityMapping $entityMapping)
+    {
+        $this->entityMappings[$entityMapping->getEntityClass()] = $entityMapping;
+    }
+
+    public function getEntityMapping(string $entityClass): EntityMapping
+    {
+        $entityMapping = $this->entityMappings[$entityClass] ?? null;
+
+        if (!$entityMapping) {
+            throw new Exception\UnknownEntityException($entityClass);
+        }
+
+        return $entityMapping;
+    }
 }

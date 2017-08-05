@@ -25,6 +25,9 @@
 
 namespace Robwasripped\Restorm;
 
+use Robwasripped\Restorm\Configuration\Configuration;
+use Robwasripped\Restorm\Mapping\EntityMappingRegister;
+
 /**
  * Description of EntityManager
  *
@@ -32,6 +35,11 @@ namespace Robwasripped\Restorm;
  */
 class EntityManager
 {
+    /**
+     * @var EntityManager
+     */
+    private static $instance;
+
     /**
      *
      * @var RepositoryRegister
@@ -50,16 +58,24 @@ class EntityManager
      */
     protected $connectionRegister;
 
-    public function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
+    protected function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
     {
         $this->repositoryRegister = $repositoryRegister;
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
     }
 
-    public function getRepository(string $entityClass): Repository
+    public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        $repositoryName = $this->entityMappingRegister->getEntityMapping($entityClass);
+        return self::$instance = new EntityManager($configuration->getRepositoryRegister(), $configuration->getEntityMappingRegister(), $configuration->getConnectionRegister());
+    }
+
+    public function getRepository($entity): Repository
+    {
+        $entityName = is_object($entity) ? get_class($entity) : $entity;
+
+        $entityMapping = $this->entityMappingRegister->getEntityMapping($entityName);
+        $repositoryName = $entityMapping->getRepositoryName();
 
         return $this->repositoryRegister->getRepository($repositoryName);
     }
