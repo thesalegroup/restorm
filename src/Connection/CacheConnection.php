@@ -23,21 +23,16 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace Robwasripped\Restorm\Connection;
 
-use Robwasripped\Restorm\EntityManager;
+use Robwasripped\Restorm\Cache\EntityCache;
 
 /**
+ * Description of CacheConnection
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-interface RepositoryInterface
+class CacheConnection implements ConnectionInterface
 {
-    public function __construct(EntityManager $entityManager, string $entityClass);
-
-    public function find(array $filters, $offset = 0, $limit = null);
-
-    public function findOne($id);
-
-    public function findAll($offset = 0, $limit = null);
+    //put your code here
 }

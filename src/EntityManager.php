@@ -27,6 +27,7 @@ namespace Robwasripped\Restorm;
 
 use Robwasripped\Restorm\Configuration\Configuration;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
+use Robwasripped\Restorm\Connection\ConnectionRegister;
 
 /**
  * Description of EntityManager
@@ -58,28 +59,49 @@ class EntityManager
      */
     protected $connectionRegister;
 
-    protected function __construct(RepositoryRegister $repositoryRegister, EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
+    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
     {
-        $this->repositoryRegister = $repositoryRegister;
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
+        $this->repositoryRegister = new RepositoryRegister;
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getRepositoryRegister(), $configuration->getEntityMappingRegister(), $configuration->getConnectionRegister());
+        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister());
     }
 
-    public function getRepository($entity): Repository
+    public function getRepository($entity): EntityRepository
     {
         $entityName = is_object($entity) ? get_class($entity) : $entity;
 
         $entityMapping = $this->entityMappingRegister->getEntityMapping($entityName);
-        $repositoryName = $entityMapping->getRepositoryName();
+        $repositoryClass = $entityMapping->getRepositoryName();
 
-        return $this->repositoryRegister->getRepository($repositoryName);
+        if (!$this->repositoryRegister->hasRepository($repositoryClass)) {
+
+            if (!is_a($repositoryClass, RepositoryInterface::class, true)) {
+                throw new \Exception('Repository must extend RepositoryInterface');
+            }
+
+            $repository = new $repositoryClass($this, $entityName);
+            $this->repositoryRegister->addRepository($repository);
+        }
+
+        return $this->repositoryRegister->getRepository($repositoryClass);
+    }
+    
+    function getEntityMappingRegister(): EntityMappingRegister
+    {
+        return $this->entityMappingRegister;
     }
 
+    function getConnectionRegister(): ConnectionRegister
+    {
+        return $this->connectionRegister;
+    }
+
+    
     public function persist($entity)
     {
         

@@ -25,17 +25,59 @@
 
 namespace Robwasripped\Restorm;
 
+use Robwasripped\Restorm\EntityManager;
+use Robwasripped\Restorm\Query\QueryBuilder;
+
 /**
- * Description of ConnectionManager
+ * Description of Repository
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class ConnectionRegister
+class EntityRepository implements RepositoryInterface
 {
-    private $connections = array();
+    /**
+     *
+     * @var EntityManager
+     */
+    protected $entityManager;
     
-    public function registerConnection(string $connectionName, array $connectionConfig)
+    /**
+     * @var string
+     */
+    protected $entityClass;
+
+    public function __construct(EntityManager $entityManager, string $entityClass)
     {
+        $this->entityManager = $entityManager;
+        $this->entityClass = $entityClass;
+    }
+
+    public function find(array $filters, $offset = 0, $limit = null)
+    {
+        ;
+    }
+
+    public function findOne($id)
+    {
+        $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($this->entityClass);
         
+        $identifierField = $entityMapping->getIdentifierName();
+        
+        $query = $this->getQueryBuilder()
+            ->get($this->entityClass)
+            ->where(['id' => $id])
+            ->getQuery();
+        
+        var_dump($query);
+    }
+
+    public function findAll($offset = 0, $limit = null)
+    {
+        ;
+    }
+    
+    protected function getQueryBuilder(): QueryBuilder
+    {
+        return new QueryBuilder($this->entityManager->getConnectionRegister(), $this->entityManager->getEntityMappingRegister());
     }
 }

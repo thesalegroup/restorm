@@ -23,36 +23,14 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace Robwasripped\Restorm\Mapping;
 
 /**
- * Description of Repository
+ * Description of EntityBuilder
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Repository implements RepositoryInterface
+class EntityBuilder
 {
-    protected $name;
-    protected $options;
-
-    public function __construct(string $name, array $options)
-    {
-        $this->name = $name;
-        $this->options = $options;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function get()
-    {
-        ;
-    }
-
-    public function getOne()
-    {
-        ;
-    }
+    //put your code here
 }

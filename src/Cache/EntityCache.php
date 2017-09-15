@@ -23,29 +23,14 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
-
-use GuzzleHttp\Client;
+namespace Robwasripped\Restorm\Cache;
 
 /**
- * Description of Connection
+ * Description of EntityCache
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class Connection
+class EntityCache
 {
-    public function setHost($host)
-    {
-        
-    }
-
-    public function setPort(int $port)
-    {
-        
-    }
-
-    public function setPath(string $path)
-    {
-
-    }
+    //put your code here
 }

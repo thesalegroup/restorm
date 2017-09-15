@@ -23,21 +23,29 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace Robwasripped\Restorm\Connection;
 
-use Robwasripped\Restorm\EntityManager;
+use GuzzleHttp\Client;
 
 /**
+ * Description of Connection
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-interface RepositoryInterface
+class GuzzleConnection implements ConnectionInterface
 {
-    public function __construct(EntityManager $entityManager, string $entityClass);
+    public function setHost($host)
+    {
+        
+    }
 
-    public function find(array $filters, $offset = 0, $limit = null);
+    public function setPort(int $port)
+    {
+        
+    }
 
-    public function findOne($id);
+    public function setPath(string $path)
+    {
 
-    public function findAll($offset = 0, $limit = null);
+    }
 }

@@ -27,10 +27,11 @@ namespace Robwasripped\Restorm\Configuration;
 
 use Symfony\Component\Yaml\Yaml;
 use Robwasripped\Restorm\RepositoryRegister;
-use Robwasripped\Restorm\Repository;
+use Robwasripped\Restorm\EntityRepository;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Mapping\EntityMapping;
-use Robwasripped\Restorm\ConnectionRegister;
+use Robwasripped\Restorm\Connection\ConnectionRegister;
+use Robwasripped\Restorm\Mapping\EntityBuilder;
 
 /**
  * Description of Configuration
@@ -50,9 +51,9 @@ class Configuration
     private $configuration;
 
     /**
-     * @var RepositoryRegister
+     * @var EntityBuilder
      */
-    private $repositoryRegister;
+    private $entityBuilder;
 
     /**
      * @var EntityMappingRegister
@@ -74,26 +75,19 @@ class Configuration
     public static function buildFromYaml(string $filePath)
     {
         if (!file_exists($filePath)) {
-            throw new \Exception(sprintf('The configuration file "%s" cannot be found.',
-                $filePath));
+            throw new \Exception(sprintf('The configuration file "%s" cannot be found.', $filePath));
         }
 
-        $configurationArray = Yaml::parse(file_get_contents($filePath),
-                Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
+        $configurationArray = Yaml::parse(file_get_contents($filePath), Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
 
         return self::$instance = new Configuration($configurationArray);
     }
 
     private function initialise()
     {
-        $this->repositoryRegister = $this->buildRepositoryRegister();
+        $this->entityBuilder = $this->buildEntityBuilder();
         $this->entityMappingRegister = $this->buildEntityMappingRegister();
         $this->connectionRegister = $this->buildConnectionRegister();
-    }
-
-    public function getRepositoryRegister(): RepositoryRegister
-    {
-        return $this->repositoryRegister;
     }
 
     public function getEntityMappingRegister(): EntityMappingRegister
@@ -106,19 +100,9 @@ class Configuration
         return $this->connectionRegister;
     }
 
-    private function buildRepositoryRegister(): RepositoryRegister
+    private function buildEntityBuilder(): EntityBuilder
     {
-        $repositoryRegister = new RepositoryRegister;
-
-        $repositoryConfigurations = $this->configuration['repositories'] ?? [];
-
-        foreach ($repositoryConfigurations as $repositoryName => $repositoryOptions) {
-            $repository = new Repository($repositoryName, $repositoryOptions);
-
-            $repositoryRegister->addRepository($repository);
-        }
-
-        return $repositoryRegister;
+        return new EntityBuilder;
     }
 
     private function buildEntityMappingRegister(): EntityMappingRegister
@@ -128,9 +112,7 @@ class Configuration
         $entityMappingConfigurations = $this->configuration['entity_mappings'] ?? [];
 
         foreach ($entityMappingConfigurations as $entityClass => $entityConfiguration) {
-            $entityMapping = new EntityMapping($entityClass,
-                $entityConfiguration['repository'],
-                $entityConfiguration['properties']);
+            $entityMapping = new EntityMapping($entityClass, $entityConfiguration['repository_class'], $entityConfiguration['properties'], $entityConfiguration['paths']);
 
             $entityMappingRegister->addEntityMapping($entityMapping);
         }

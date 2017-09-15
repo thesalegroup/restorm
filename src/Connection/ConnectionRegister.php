@@ -23,21 +23,19 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
-
-use Robwasripped\Restorm\EntityManager;
+namespace Robwasripped\Restorm\Connection;
 
 /**
+ * Description of ConnectionManager
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-interface RepositoryInterface
+class ConnectionRegister
 {
-    public function __construct(EntityManager $entityManager, string $entityClass);
-
-    public function find(array $filters, $offset = 0, $limit = null);
-
-    public function findOne($id);
-
-    public function findAll($offset = 0, $limit = null);
+    private $connections = array();
+    
+    public function registerConnection(string $connectionName, array $connectionConfig)
+    {
+        
+    }
 }
