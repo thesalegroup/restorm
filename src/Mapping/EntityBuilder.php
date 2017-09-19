@@ -25,6 +25,8 @@
 
 namespace Robwasripped\Restorm\Mapping;
 
+use Robwasripped\Restorm\Mapping\EntityMappingRegister;
+
 /**
  * Description of EntityBuilder
  *
@@ -32,5 +34,30 @@ namespace Robwasripped\Restorm\Mapping;
  */
 class EntityBuilder
 {
-    //put your code here
+    /**
+     * @var EntityMappingRegister
+     */
+    private $entityMappingRegister;
+
+    function __construct(EntityMappingRegister $entityMappingRegister)
+    {
+        $this->entityMappingRegister = $entityMappingRegister;
+    }
+
+    public function buildEntity(string $entityClass, $data)
+    {
+        $entityMapping = $this->entityMappingRegister->getEntityMapping($entityClass);
+        
+        $entity = new $entityClass;
+        $reflection = new \ReflectionClass($entity);
+        
+        foreach($entityMapping->getProperties() as $propertyName => $propertyDetails) {
+            $propertyReflection = $reflection->getProperty($propertyName);
+            $propertyReflection->setAccessible(true);
+            $propertyReflection->setValue($entity, $data->$propertyName);
+            $propertyReflection->setAccessible(false);
+        }
+        
+        return $entity;
+    }
 }

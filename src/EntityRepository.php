@@ -52,9 +52,14 @@ class EntityRepository implements RepositoryInterface
         $this->entityClass = $entityClass;
     }
 
-    public function find(array $filters, $offset = 0, $limit = null)
+    public function find(array $filters, $page = 1, $limit = 0)
     {
-        ;
+        return $this->getQueryBuilder()
+            ->get($this->entityClass)
+            ->where($filters)
+            ->page($page, $limit)
+            ->getQuery()
+            ->getResult();
     }
 
     public function findOne($id)
@@ -63,21 +68,23 @@ class EntityRepository implements RepositoryInterface
         
         $identifierField = $entityMapping->getIdentifierName();
         
-        $query = $this->getQueryBuilder()
+        return $this->getQueryBuilder()
             ->get($this->entityClass)
-            ->where(['id' => $id])
-            ->getQuery();
-        
-        var_dump($query);
+            ->where([$identifierField => $id])
+            ->getQuery()
+            ->getResult();
     }
 
     public function findAll($offset = 0, $limit = null)
     {
-        ;
+        return $this->getQueryBuilder()
+            ->get($this->entityClass)
+            ->getQuery()
+            ->getResult();
     }
     
     protected function getQueryBuilder(): QueryBuilder
     {
-        return new QueryBuilder($this->entityManager->getConnectionRegister(), $this->entityManager->getEntityMappingRegister());
+        return new QueryBuilder($this->entityManager);
     }
 }

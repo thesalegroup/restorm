@@ -14,6 +14,13 @@ namespace Robwasripped\Restorm\Mapping;
  */
 class EntityMapping
 {
+    const PATH_LIST = 'list';
+    const PATH_GET = 'get';
+    const PATH_POST = 'post';
+    const PATH_PUT = 'put';
+    const PATH_PATCH = 'patch';
+    const PATH_DELETE = 'delete';
+
     /**
      * @var string
      */
@@ -37,14 +44,20 @@ class EntityMapping
     /**
      * @var string
      */
+    private $connection;
+
+    /**
+     * @var string
+     */
     private $indentifier;
 
-    public function __construct(string $entityClass, string $repositoryName, array $properties, array $paths)
+    public function __construct(string $entityClass, string $repositoryName, array $properties, array $paths, string $connection)
     {
         $this->entityClass = $entityClass;
         $this->repositoryName = $repositoryName;
         $this->properties = $properties;
         $this->paths = $paths;
+        $this->connection = $connection;
     }
 
     public function getEntityClass()
@@ -81,5 +94,15 @@ class EntityMapping
     public function getpath($method)
     {
         return $this->paths[$method];
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    function getProperties()
+    {
+        return $this->properties;
     }
 }

@@ -28,6 +28,7 @@ namespace Robwasripped\Restorm;
 use Robwasripped\Restorm\Configuration\Configuration;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Connection\ConnectionRegister;
+use Robwasripped\Restorm\Mapping\EntityBuilder;
 
 /**
  * Description of EntityManager
@@ -59,38 +60,45 @@ class EntityManager
      */
     protected $connectionRegister;
 
-    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister)
+    /**
+     *
+     * @var EntityBuilder
+     */
+    protected $entityBuilder;
+
+    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EntityBuilder $entityBuilder)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
+        $this->entityBuilder = $entityBuilder;
         $this->repositoryRegister = new RepositoryRegister;
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister());
+        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEntityBuilder());
     }
 
     public function getRepository($entity): EntityRepository
     {
-        $entityName = is_object($entity) ? get_class($entity) : $entity;
+        $entityClass = is_object($entity) ? get_class($entity) : $entity;
 
-        $entityMapping = $this->entityMappingRegister->getEntityMapping($entityName);
+        $entityMapping = $this->entityMappingRegister->getEntityMapping($entityClass);
         $repositoryClass = $entityMapping->getRepositoryName();
 
-        if (!$this->repositoryRegister->hasRepository($repositoryClass)) {
+        if (!$this->repositoryRegister->hasRepository($entityClass)) {
 
             if (!is_a($repositoryClass, RepositoryInterface::class, true)) {
                 throw new \Exception('Repository must extend RepositoryInterface');
             }
 
-            $repository = new $repositoryClass($this, $entityName);
-            $this->repositoryRegister->addRepository($repository);
+            $repository = new $repositoryClass($this, $entityClass);
+            $this->repositoryRegister->addRepository($entityClass, $repository);
         }
 
-        return $this->repositoryRegister->getRepository($repositoryClass);
+        return $this->repositoryRegister->getRepository($entityClass);
     }
-    
+
     function getEntityMappingRegister(): EntityMappingRegister
     {
         return $this->entityMappingRegister;
@@ -101,7 +109,11 @@ class EntityManager
         return $this->connectionRegister;
     }
 
-    
+    function getEntityBuilder(): EntityBuilder
+    {
+        return $this->entityBuilder;
+    }
+
     public function persist($entity)
     {
         

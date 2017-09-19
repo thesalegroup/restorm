@@ -25,6 +25,9 @@
 
 namespace Robwasripped\Restorm\Query;
 
+use Robwasripped\Restorm\Connection\ConnectionInterface;
+use Robwasripped\Restorm\Mapping\EntityBuilder;
+
 /**
  * Description of Query
  *
@@ -77,8 +80,26 @@ class Query
      */
     private $path;
 
-    public function __construct(string $path, string $method, $data, array $filter = [], int $page = 1, int $perPage = 0, array $sort = [])
+    /**
+     * @var ConnectionInterface
+     */
+    private $connection;
+
+    /**
+     * @var EntityBuilder
+     */
+    private $entityBuilder;
+
+    /**
+     * @var string
+     */
+    private $entityClass;
+
+    public function __construct(ConnectionInterface $connection, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 1, int $perPage = 0, array $sort = [])
     {
+        $this->connection = $connection;
+        $this->entityBuilder = $entityBuilder;
+        $this->entityClass = $entityClass;
         $this->path = $path;
         $this->method = $method;
         $this->data = $data;
@@ -86,5 +107,36 @@ class Query
         $this->page = $page;
         $this->perPage = $perPage;
         $this->sort = $sort;
+    }
+
+    public function getResult()
+    {
+        $result = $this->connection->handleQuery($this);
+
+        if (is_array($result)) {
+            $entities = array();
+            foreach ($result as $singleResult) {
+                $entities[] = $this->entityBuilder->buildEntity($this->entityClass, $singleResult);
+            }
+
+            return $entities;
+        } else {
+            return $this->entityBuilder->buildEntity($this->entityClass, $result);
+        }
+    }
+
+    function getMethod()
+    {
+        return $this->method;
+    }
+
+    function getPath()
+    {
+        return $this->path;
+    }
+
+    function getFilter()
+    {
+        return $this->filter;
     }
 }

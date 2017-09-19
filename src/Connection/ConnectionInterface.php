@@ -25,11 +25,13 @@
 
 namespace Robwasripped\Restorm\Connection;
 
+use Robwasripped\Restorm\Query\Query;
+
 /**
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
 interface ConnectionInterface
 {
-    //put your code here
+    public function handleQuery(Query $query);
 }

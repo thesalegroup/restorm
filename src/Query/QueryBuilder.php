@@ -25,9 +25,9 @@
 
 namespace Robwasripped\Restorm\Query;
 
-use Robwasripped\Restorm\Connection\ConnectionRegister;
-use Robwasripped\Restorm\Mapping\EntityMappingRegister;
+use Robwasripped\Restorm\EntityManager;
 use Robwasripped\Restorm\Query\Query;
+use Robwasripped\Restorm\Mapping\EntityMapping;
 
 /**
  * Description of QueryBuilder
@@ -37,14 +37,9 @@ use Robwasripped\Restorm\Query\Query;
 class QueryBuilder
 {
     /**
-     * @var ConnectionRegister
+     * @var EntityManager
      */
-    private $connectionRegister;
-
-    /**
-     * @var EntityMappingRegister
-     */
-    private $entityMappingRegister;
+    private $entityManager;
 
     /**
      * @var string
@@ -86,10 +81,9 @@ class QueryBuilder
      */
     private $path;
 
-    public function __construct(ConnectionRegister $connectionRegister, EntityMappingRegister $entityMappingRegister)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->connectionRegister = $connectionRegister;
-        $this->entityMappingRegister = $entityMappingRegister;
+        $this->entityManager = $entityManager;
     }
 
     public function get(string $entityClass): self
@@ -149,21 +143,39 @@ class QueryBuilder
 
     private function getEndpoint()
     {
-        $entityMapping = $this->entityMappingRegister->getEntityMapping($this->entityClass);
+        $entityMapping = $this->getEntityMapping($this->entityClass);
 
-        $path = $entityMapping->getpath($this->method);
+        $isSingle = array_key_exists($entityMapping->getIdentifierName(), $this->filter);
 
-        if(array_key_exists($entityMapping->getIdentifierName(), $this->filter)) {
+        switch ($this->method) {
+            case Query::METHOD_GET && $isSingle:
+                $pathLabel = EntityMapping::PATH_GET;
+                break;
+            case Query::METHOD_GET && !$isSingle:
+                $pathLabel = EntityMapping::PATH_LIST;
+                break;
+        }
+        $path = $entityMapping->getpath($pathLabel);
+
+        if ($isSingle) {
             $path = sprintf('%s/%s', rtrim($path, '/'), ltrim($this->filter[$entityMapping->getIdentifierName()], '/'));
             unset($this->filter[$entityMapping->getIdentifierName()]);
         }
-        
+
         return $path;
     }
 
     public function getQuery(): Query
     {
         $endpoint = $this->getEndpoint();
-        return new Query($endpoint, $this->method, $this->data, $this->filter, $this->page, $this->perPage, $this->sort);
+        $connection = $this->entityManager->getConnectionRegister()->getConnection($this->getEntityMapping($this->entityClass)->getConnection());
+        $entityBuilder = $this->entityManager->getEntityBuilder();
+
+        return new Query($connection, $entityBuilder, $this->entityClass, $endpoint, $this->method, $this->data, $this->filter, $this->page, $this->perPage, $this->sort);
+    }
+
+    private function getEntityMapping(string $entityClass): EntityMapping
+    {
+        return $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
     }
 }

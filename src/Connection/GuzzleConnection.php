@@ -25,6 +25,7 @@
 
 namespace Robwasripped\Restorm\Connection;
 
+use Robwasripped\Restorm\Query\Query;
 use GuzzleHttp\Client;
 
 /**
@@ -34,18 +35,34 @@ use GuzzleHttp\Client;
  */
 class GuzzleConnection implements ConnectionInterface
 {
-    public function setHost($host)
+    /**
+     * @var Client
+     */
+    private $guzzleClient;
+    private $uri;
+    private $config;
+
+    public function __construct(array $config)
     {
-        
+        $this->config = $config;
+
+        $this->guzzleClient = new Client([
+            'base_uri' => rtrim($config['base_uri'], '/') . '/'
+        ]);
     }
 
-    public function setPort(int $port)
+    public function handleQuery(Query $query)
     {
-        
-    }
+        $path = ltrim($query->getPath(), '/');
 
-    public function setPath(string $path)
-    {
+        $options = array();
 
+        if ($this->config['filter_mode'] === 'query') {
+            $options['query'] = $query->getFilter();
+        }
+
+        $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
+
+        return json_decode($response->getBody()->getContents());
     }
 }

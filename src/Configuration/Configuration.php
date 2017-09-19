@@ -26,11 +26,10 @@
 namespace Robwasripped\Restorm\Configuration;
 
 use Symfony\Component\Yaml\Yaml;
-use Robwasripped\Restorm\RepositoryRegister;
-use Robwasripped\Restorm\EntityRepository;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Mapping\EntityMapping;
 use Robwasripped\Restorm\Connection\ConnectionRegister;
+use Robwasripped\Restorm\Connection\GuzzleConnection;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
 
 /**
@@ -85,9 +84,14 @@ class Configuration
 
     private function initialise()
     {
-        $this->entityBuilder = $this->buildEntityBuilder();
         $this->entityMappingRegister = $this->buildEntityMappingRegister();
+        $this->entityBuilder = $this->buildEntityBuilder();
         $this->connectionRegister = $this->buildConnectionRegister();
+    }
+
+    function getEntityBuilder(): EntityBuilder
+    {
+        return $this->entityBuilder;
     }
 
     public function getEntityMappingRegister(): EntityMappingRegister
@@ -102,7 +106,7 @@ class Configuration
 
     private function buildEntityBuilder(): EntityBuilder
     {
-        return new EntityBuilder;
+        return new EntityBuilder($this->entityMappingRegister);
     }
 
     private function buildEntityMappingRegister(): EntityMappingRegister
@@ -112,7 +116,7 @@ class Configuration
         $entityMappingConfigurations = $this->configuration['entity_mappings'] ?? [];
 
         foreach ($entityMappingConfigurations as $entityClass => $entityConfiguration) {
-            $entityMapping = new EntityMapping($entityClass, $entityConfiguration['repository_class'], $entityConfiguration['properties'], $entityConfiguration['paths']);
+            $entityMapping = new EntityMapping($entityClass, $entityConfiguration['repository_class'], $entityConfiguration['properties'], $entityConfiguration['paths'], $entityConfiguration['connection']);
 
             $entityMappingRegister->addEntityMapping($entityMapping);
         }
@@ -122,6 +126,15 @@ class Configuration
 
     private function buildConnectionRegister(): ConnectionRegister
     {
-        return new ConnectionRegister;
+        $connectionRegister = new ConnectionRegister;
+
+        $connectionConfigurations = $this->configuration['connections'] ?? [];
+
+        foreach ($connectionConfigurations as $connectionName => $connectionConfiguration) {
+            $connection = new GuzzleConnection($connectionConfiguration);
+            $connectionRegister->registerConnection($connectionName, $connection);
+        }
+
+        return $connectionRegister;
     }
 }

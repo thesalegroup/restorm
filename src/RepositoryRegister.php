@@ -34,18 +34,18 @@ class RepositoryRegister
 {
     private $repositories = array();
 
-    public function addRepository(EntityRepository $repository)
+    public function addRepository(string $entityClass, EntityRepository $repository)
     {
-        $this->repositories[get_class($repository)] = $repository;
+        $this->repositories[$entityClass] = $repository;
     }
 
-    public function getRepository(string $repositoryClass): EntityRepository
+    public function getRepository(string $entityClass): EntityRepository
     {
-        return $this->repositories[$repositoryClass];
+        return $this->repositories[$entityClass];
     }
 
-    public function hasRepository(string $repositoryClass): bool
+    public function hasRepository(string $entityClass): bool
     {
-        return array_key_exists($repositoryClass, $this->repositories);
+        return array_key_exists($entityClass, $this->repositories);
     }
 }

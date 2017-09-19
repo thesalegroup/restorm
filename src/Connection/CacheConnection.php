@@ -25,6 +25,7 @@
 
 namespace Robwasripped\Restorm\Connection;
 
+use Robwasripped\Restorm\Query\Query;
 use Robwasripped\Restorm\Cache\EntityCache;
 
 /**
@@ -34,5 +35,9 @@ use Robwasripped\Restorm\Cache\EntityCache;
  */
 class CacheConnection implements ConnectionInterface
 {
-    //put your code here
+
+    public function handleQuery(Query $query)
+    {
+        
+    }
 }

@@ -25,6 +25,8 @@
 
 namespace Robwasripped\Restorm\Connection;
 
+use Robwasripped\Restorm\Connection\ConnectionInterface;
+
 /**
  * Description of ConnectionManager
  *
@@ -34,8 +36,13 @@ class ConnectionRegister
 {
     private $connections = array();
     
-    public function registerConnection(string $connectionName, array $connectionConfig)
+    public function registerConnection(string $connectionName, ConnectionInterface $connection)
     {
-        
+        $this->connections[$connectionName] = $connection;
+    }
+    
+    public function getConnection(string $connectionName): ConnectionInterface
+    {
+        return $this->connections[$connectionName];
     }
 }
