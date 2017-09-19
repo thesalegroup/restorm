@@ -27,6 +27,7 @@ namespace Robwasripped\Restorm\Query;
 
 use Robwasripped\Restorm\Connection\ConnectionInterface;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
+use Robwasripped\Restorm\EntityCollection;
 
 /**
  * Description of Query
@@ -114,12 +115,12 @@ class Query
         $result = $this->connection->handleQuery($this);
 
         if (is_array($result)) {
-            $entities = array();
+            $entityCollection = new EntityCollection;
             foreach ($result as $singleResult) {
-                $entities[] = $this->entityBuilder->buildEntity($this->entityClass, $singleResult);
+                $entityCollection[] = $this->entityBuilder->buildEntity($this->entityClass, $singleResult);
             }
 
-            return $entities;
+            return $entityCollection;
         } else {
             return $this->entityBuilder->buildEntity($this->entityClass, $result);
         }
