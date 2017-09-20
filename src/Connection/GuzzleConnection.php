@@ -60,6 +60,15 @@ class GuzzleConnection implements ConnectionInterface
         if ($this->config['filter_mode'] === 'query') {
             $options['query'] = $query->getFilter();
         }
+        
+        if(isset($this->config['pagination_parameters'])) {
+            if($query->getPage()) {
+                $options['query'][$this->config['pagination_parameters']['page_param']] = $query->getPage();
+            }
+            if($query->getPerPage()) {
+                $options['query'][$this->config['pagination_parameters']['per_page_param']] = $query->getPerPage();
+            }
+        }
 
         $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
 

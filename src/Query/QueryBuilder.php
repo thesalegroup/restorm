@@ -69,7 +69,7 @@ class QueryBuilder
     /**
      * @var int
      */
-    private $page = 1;
+    private $page = 0;
 
     /**
      * @var int

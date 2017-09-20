@@ -28,6 +28,7 @@ namespace Robwasripped\Restorm\Query;
 use Robwasripped\Restorm\Connection\ConnectionInterface;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
 use Robwasripped\Restorm\EntityCollection;
+use Robwasripped\Restorm\PaginatedCollection;
 
 /**
  * Description of Query
@@ -96,26 +97,31 @@ class Query
      */
     private $entityClass;
 
-    public function __construct(ConnectionInterface $connection, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 1, int $perPage = 0, array $sort = [])
+    public function __construct(ConnectionInterface $connection, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
     {
         $this->connection = $connection;
         $this->entityBuilder = $entityBuilder;
         $this->entityClass = $entityClass;
-        $this->path = $path;
-        $this->method = $method;
-        $this->data = $data;
-        $this->filter = $filter;
-        $this->page = $page;
-        $this->perPage = $perPage;
-        $this->sort = $sort;
+        $this->setPath($path);
+        $this->setMethod($method);
+        $this->setData($data);
+        $this->setFilter($filter);
+        $this->setPage($page);
+        $this->setPerPage($perPage);
+        $this->setSort($sort);
     }
 
     public function getResult()
     {
         $result = $this->connection->handleQuery($this);
+        
+        if(empty($result)) {
+            return null;
+        }
 
         if (is_array($result)) {
-            $entityCollection = new EntityCollection;
+            $entityCollection = $this->page == 0 || ($this->perPage == 0  && $this->page == 0) ? new PaginatedCollection($this) : new EntityCollection;
+
             foreach ($result as $singleResult) {
                 $entityCollection[] = $this->entityBuilder->buildEntity($this->entityClass, $singleResult);
             }
@@ -126,18 +132,73 @@ class Query
         }
     }
 
-    function getMethod()
+    public function getMethod()
     {
         return $this->method;
     }
 
-    function getPath()
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    public function getSort()
+    {
+        return $this->sort;
+    }
+
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    public function getPerPage()
+    {
+        return $this->perPage;
+    }
+
+    public function getPath()
     {
         return $this->path;
     }
 
-    function getFilter()
+    public function setMethod($method)
     {
-        return $this->filter;
+        $this->method = $method;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    public function setFilter($filter)
+    {
+        $this->filter = $filter;
+    }
+
+    public function setSort($sort)
+    {
+        $this->sort = $sort;
+    }
+
+    public function setPage($page)
+    {
+        $this->page = $page;
+    }
+
+    public function setPerPage($perPage)
+    {
+        $this->perPage = $perPage;
+    }
+
+    public function setPath($path)
+    {
+        $this->path = $path;
     }
 }
