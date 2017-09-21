@@ -31,6 +31,7 @@ use Robwasripped\Restorm\Mapping\EntityMapping;
 use Robwasripped\Restorm\Connection\ConnectionRegister;
 use Robwasripped\Restorm\Connection\GuzzleConnection;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Description of Configuration
@@ -64,6 +65,11 @@ class Configuration
      */
     private $connectionRegister;
 
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
     private function __construct(array $configuration)
     {
         $this->configuration = $configuration;
@@ -87,6 +93,7 @@ class Configuration
         $this->entityMappingRegister = $this->buildEntityMappingRegister();
         $this->entityBuilder = $this->buildEntityBuilder();
         $this->connectionRegister = $this->buildConnectionRegister();
+        $this->eventDispatcher = new EventDispatcher;
     }
 
     function getEntityBuilder(): EntityBuilder
@@ -102,6 +109,11 @@ class Configuration
     public function getConnectionRegister(): ConnectionRegister
     {
         return $this->connectionRegister;
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->eventDispatcher;
     }
 
     private function buildEntityBuilder(): EntityBuilder

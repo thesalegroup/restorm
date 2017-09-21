@@ -29,6 +29,8 @@ use Robwasripped\Restorm\Configuration\Configuration;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Connection\ConnectionRegister;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Robwasripped\Restorm\EntityStore;
 
 /**
  * Description of EntityManager
@@ -66,17 +68,33 @@ class EntityManager
      */
     protected $entityBuilder;
 
-    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EntityBuilder $entityBuilder)
+    /**
+     *
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
+     *
+     * @var EntityStore
+     */
+    protected $entityStore;
+
+    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EntityBuilder $entityBuilder, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
         $this->entityBuilder = $entityBuilder;
+        $this->eventDispatcher = $eventDispatcher;
         $this->repositoryRegister = new RepositoryRegister;
+        $this->entityStore = new EntityStore($this->entityMappingRegister);
+        
+        $this->eventDispatcher->addSubscriber($this->entityStore);
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEntityBuilder());
+        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEntityBuilder(), $configuration->getEventDispatcher());
     }
 
     public function getRepository($entity): EntityRepository
@@ -99,19 +117,24 @@ class EntityManager
         return $this->repositoryRegister->getRepository($entityClass);
     }
 
-    function getEntityMappingRegister(): EntityMappingRegister
+    public function getEntityMappingRegister(): EntityMappingRegister
     {
         return $this->entityMappingRegister;
     }
 
-    function getConnectionRegister(): ConnectionRegister
+    public function getConnectionRegister(): ConnectionRegister
     {
         return $this->connectionRegister;
     }
 
-    function getEntityBuilder(): EntityBuilder
+    public function getEntityBuilder(): EntityBuilder
     {
         return $this->entityBuilder;
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     public function persist($entity)

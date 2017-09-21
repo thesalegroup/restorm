@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 Rob Treacy <email@roberttreacy.com>.
+ * Copyright 2017 Rob Treacy <robert.treacy@thesalegroup.co.uk>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,51 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Connection;
+namespace Robwasripped\Restorm\Event;
 
-use Robwasripped\Restorm\Query\Query;
-use Robwasripped\Restorm\Cache\EntityStore;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Description of CacheConnection
+ * Description of OnResponseEvent
  *
- * @author Rob Treacy <email@roberttreacy.com>
+ * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class CacheConnection implements ConnectionInterface
+class PreBuildEvent extends Event
 {
+    const NAME = 'restorm.pre_build';
 
-    public function handleQuery(Query $query)
+    private $entityClass;
+    private $data;
+    private $entity;
+
+    public function __construct($entityClass, $data)
     {
-        
+        $this->entityClass = $entityClass;
+        $this->data = $data;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
     }
 }

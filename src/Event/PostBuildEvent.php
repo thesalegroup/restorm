@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 Rob Treacy <email@roberttreacy.com>.
+ * Copyright 2017 Rob Treacy <robert.treacy@thesalegroup.co.uk>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,33 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Cache;
+namespace Robwasripped\Restorm\Event;
+
+use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Description of EntityCache
+ * Description of PostBuildEvent
  *
- * @author Rob Treacy <email@roberttreacy.com>
+ * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class EntityCache
+class PostBuildEvent extends Event
 {
-    //put your code here
+    const NAME = 'restorm.post_build';
+
+    private $entity;
+
+    public function __construct($entity)
+    {
+        $this->entity = $entity;
+    }
+
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+    }
 }

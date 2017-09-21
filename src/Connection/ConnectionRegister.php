@@ -35,14 +35,27 @@ use Robwasripped\Restorm\Connection\ConnectionInterface;
 class ConnectionRegister
 {
     private $connections = array();
-    
+
     public function registerConnection(string $connectionName, ConnectionInterface $connection)
     {
         $this->connections[$connectionName] = $connection;
     }
-    
-    public function getConnection(string $connectionName): ConnectionInterface
+
+    /**
+     * 
+     * @param string $connectionName
+     * @return ConnectionInterface[]
+     * 
+     */
+    public function getConnections(string $connectionName): array
     {
-        return $this->connections[$connectionName];
+        $connections = array();
+        if (array_key_exists('_cache', $this->connections)) {
+            $connections[] = $this->connections['_cache'];
+        }
+
+        $connections[] = $this->connections[$connectionName];
+
+        return $connections;
     }
 }

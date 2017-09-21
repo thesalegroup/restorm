@@ -26,9 +26,12 @@
 namespace Robwasripped\Restorm\Query;
 
 use Robwasripped\Restorm\Connection\ConnectionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
 use Robwasripped\Restorm\EntityCollection;
 use Robwasripped\Restorm\PaginatedCollection;
+use Robwasripped\Restorm\Event\PreBuildEvent;
+use Robwasripped\Restorm\Event\PostBuildEvent;
 
 /**
  * Description of Query
@@ -83,9 +86,14 @@ class Query
     private $path;
 
     /**
-     * @var ConnectionInterface
+     * @var ConnectionInterface[]
      */
-    private $connection;
+    private $connections;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * @var EntityBuilder
@@ -97,9 +105,10 @@ class Query
      */
     private $entityClass;
 
-    public function __construct(ConnectionInterface $connection, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
+    public function __construct(array $connections, EventDispatcherInterface $eventDispatcher, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
     {
-        $this->connection = $connection;
+        $this->connections = $connections;
+        $this->eventDispatcher = $eventDispatcher;
         $this->entityBuilder = $entityBuilder;
         $this->entityClass = $entityClass;
         $this->setPath($path);
@@ -113,23 +122,45 @@ class Query
 
     public function getResult()
     {
-        $result = $this->connection->handleQuery($this);
-        
-        if(empty($result)) {
-            return null;
-        }
+        foreach ($this->connections as $connection) {
+            $result = $connection->handleQuery($this);
 
-        if (is_array($result)) {
-            $entityCollection = $this->page == 0 || ($this->perPage == 0  && $this->page == 0) ? new PaginatedCollection($this) : new EntityCollection;
-
-            foreach ($result as $singleResult) {
-                $entityCollection[] = $this->entityBuilder->buildEntity($this->entityClass, $singleResult);
+            if (is_null($result) || empty($result)) {
+                continue;
             }
 
-            return $entityCollection;
-        } else {
-            return $this->entityBuilder->buildEntity($this->entityClass, $result);
+            if (is_array($result)) {
+                $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0)
+                        ? new PaginatedCollection($this) : new EntityCollection;
+
+                foreach ($result as $singleResult) {
+                    $entityCollection[] = $this->buildEntity($singleResult);
+                }
+
+                return $entityCollection;
+            } else {
+                return $this->buildEntity($result);
+            }
         }
+
+        return null;
+    }
+
+    private function buildEntity($entityData)
+    {
+        $preBuildEvent = new PreBuildEvent($this->entityClass, $entityData);
+        $this->eventDispatcher->dispatch(PreBuildEvent::NAME, $preBuildEvent);
+        
+        if($preBuildEvent->getEntity()) {
+            return $preBuildEvent->getEntity();
+        }
+
+        $entity = $this->entityBuilder->buildEntity($this->entityClass, $preBuildEvent->getData());
+        
+        $postBuildEvent = new PostBuildEvent($entity);
+        $this->eventDispatcher->dispatch(PostBuildEvent::NAME, $postBuildEvent);
+        
+        return $entity;
     }
 
     public function getMethod()
@@ -200,5 +231,10 @@ class Query
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    public function getEntityClass()
+    {
+        return $this->entityClass;
     }
 }
