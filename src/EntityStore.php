@@ -84,19 +84,29 @@ class EntityStore implements EventSubscriberInterface
     public function cacheEntity(PostBuildEvent $event)
     {
         $entityClass = get_class($event->getEntity());
-        $entityIdentifierName = $this->getEntityIdentifierName($entityClass);
-
-        $entityReflection = new \ReflectionClass($event->getEntity());
-        $property = $entityReflection->getProperty($entityIdentifierName);
-        $property->setAccessible(true);
-        $identifier = $property->getValue($event->getEntity());
-        $property->setAccessible(false);
+        $identifier = $this->getEntityIdentifier($event->getEntity());
 
         if (isset($this->entityInstances[$entityClass][$identifier]) && $this->entityInstances[$entityClass][$identifier] !== $event->getEntity()) {
             throw new \LogicException('this should not happen');
         }
 
         $this->entityInstances[$entityClass][$identifier] = $event->getEntity();
+    }
+
+    public function getEntityData($entity)
+    {
+        return $this->entityData[get_class($entity)][$this->getEntityIdentifier($entity)] ?? null;
+    }
+
+    private function getEntityIdentifier($entity)
+    {
+        $entityClass = get_class($entity);
+        $entityIdentifierName = $this->getEntityIdentifierName($entityClass);
+
+        $entityReflection = new \ReflectionClass($entity);
+        $property = $entityReflection->getProperty($entityIdentifierName);
+        $property->setAccessible(true);
+        return $property->getValue($entity);
     }
 
     private function getEntityIdentifierName(string $entityClass): string

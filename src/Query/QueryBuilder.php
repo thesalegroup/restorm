@@ -126,6 +126,13 @@ class QueryBuilder
         return $this;
     }
 
+    public function setData($data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
     public function sortBy(array $sort): self
     {
         $this->sort = $sort;
@@ -153,6 +160,18 @@ class QueryBuilder
                 break;
             case Query::METHOD_GET && !$isSingle:
                 $pathLabel = EntityMapping::PATH_LIST;
+                break;
+            case Query::METHOD_PATCH:
+                $pathLabel = EntityMapping::PATH_PATCH;
+                break;
+            case Query::METHOD_PUT:
+                $pathLabel = EntityMapping::PATH_PUT;
+                break;
+            case Query::METHOD_POST:
+                $pathLabel = EntityMapping::PATH_POST;
+                break;
+            case Query::METHOD_DELETE:
+                $pathLabel = EntityMapping::PATH_DELETE;
                 break;
         }
         $path = $entityMapping->getpath($pathLabel);

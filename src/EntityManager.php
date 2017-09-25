@@ -139,6 +139,25 @@ class EntityManager
 
     public function persist($entity)
     {
+        $knownState = $this->entityStore->getEntityData($entity);
+
+        // Filter only mapped fields
+        $mappedProperties = $this->entityMappingRegister->getEntityMapping(get_class($entity))->getProperties();
+        $mappedKnownState = array_intersect_key((array)$knownState, $mappedProperties);
         
+        // Get normalised entity
+        $currentState = array();
+        foreach($mappedProperties as $propertyName => $property) {
+            $reflection = new \ReflectionClass($entity);
+            $propertyReflection = $reflection->getProperty($propertyName);
+            $propertyReflection->setAccessible(true);
+            $currentState[$propertyName] = $propertyReflection->getValue($entity);
+        }
+        
+        // Diff arrays to find changes
+        $changes = array_diff($currentState, $mappedKnownState);
+        // Build query and set array as body of PATCH request
+        
+        // Run query
     }
 }
