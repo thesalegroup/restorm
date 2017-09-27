@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Event\PreBuildEvent;
 use Robwasripped\Restorm\Event\PostBuildEvent;
+use Robwasripped\Restorm\Entity\EntityMetadataRegister;
+use Robwasripped\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityCache
@@ -41,12 +43,26 @@ class EntityStore implements EventSubscriberInterface
      * @var EntityMappingRegister
      */
     private $entityMappingRegister;
-    private $entityData;
-    private $entityInstances;
 
-    public function __construct(EntityMappingRegister $entityMappingRegister)
+    /**
+     * @var array
+     */
+    private $entityData;
+
+    /**
+     * @var array
+     */
+    private $entityInstances;
+    
+    /**
+     * @var EntityMetadataRegister
+     */
+    private $entityMetadataRegister;
+
+    public function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
     {
         $this->entityMappingRegister = $entityMappingRegister;
+        $this->entityMetadataRegister = $entityMetadataRegister;
     }
 
     public static function getSubscribedEvents(): array
@@ -84,7 +100,10 @@ class EntityStore implements EventSubscriberInterface
     public function cacheEntity(PostBuildEvent $event)
     {
         $entityClass = get_class($event->getEntity());
-        $identifier = $this->getEntityIdentifier($event->getEntity());
+        
+        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($event->getEntity());
+
+        $identifier = $entityMetadata->getIdentifierValue();
 
         if (isset($this->entityInstances[$entityClass][$identifier]) && $this->entityInstances[$entityClass][$identifier] !== $event->getEntity()) {
             throw new \LogicException('this should not happen');
@@ -95,18 +114,13 @@ class EntityStore implements EventSubscriberInterface
 
     public function getEntityData($entity)
     {
-        return $this->entityData[get_class($entity)][$this->getEntityIdentifier($entity)] ?? null;
+        return $this->entityData[get_class($entity)][$this->getEntityIdentifier($entity)]
+                ?? null;
     }
 
     private function getEntityIdentifier($entity)
     {
-        $entityClass = get_class($entity);
-        $entityIdentifierName = $this->getEntityIdentifierName($entityClass);
-
-        $entityReflection = new \ReflectionClass($entity);
-        $property = $entityReflection->getProperty($entityIdentifierName);
-        $property->setAccessible(true);
-        return $property->getValue($entity);
+        return $this->entityMetadataRegister->getEntityMetadata($entity)->getIdentifierValue();
     }
 
     private function getEntityIdentifierName(string $entityClass): string

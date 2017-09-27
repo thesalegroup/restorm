@@ -151,15 +151,13 @@ class Query
         $preBuildEvent = new PreBuildEvent($this->entityClass, $entityData);
         $this->eventDispatcher->dispatch(PreBuildEvent::NAME, $preBuildEvent);
         
-        if($preBuildEvent->getEntity()) {
-            return $preBuildEvent->getEntity();
-        }
-
-        $entity = $this->entityBuilder->buildEntity($this->entityClass, $preBuildEvent->getData());
+        $entity = $preBuildEvent->getEntity() ?: $this->entityBuilder->buildEntity($this->entityClass);
         
+        $this->entityBuilder->populateEntity($entity, $preBuildEvent->getData());
+
         $postBuildEvent = new PostBuildEvent($entity);
         $this->eventDispatcher->dispatch(PostBuildEvent::NAME, $postBuildEvent);
-        
+
         return $entity;
     }
 

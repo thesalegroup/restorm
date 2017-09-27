@@ -26,9 +26,13 @@
 namespace Robwasripped\Restorm\Mapping;
 
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
+use Robwasripped\Restorm\Entity\EntityMetadataRegister;
+use Robwasripped\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityBuilder
+ * 
+ * @todo Use an EntityMetadata instance to build an entity
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
@@ -38,26 +42,35 @@ class EntityBuilder
      * @var EntityMappingRegister
      */
     private $entityMappingRegister;
+    
+    /**
+     * @var EntityMetadataRegister
+     */
+    private $entityMetadataRegister;
 
-    function __construct(EntityMappingRegister $entityMappingRegister)
+    function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
     {
         $this->entityMappingRegister = $entityMappingRegister;
+        $this->entityMetadataRegister = $entityMetadataRegister;
     }
 
-    public function buildEntity(string $entityClass, $data)
+    public function buildEntity(string $entityClass)
     {
         $entityMapping = $this->entityMappingRegister->getEntityMapping($entityClass);
         
         $entity = new $entityClass;
-        $reflection = new \ReflectionClass($entity);
-        
-        foreach($entityMapping->getProperties() as $propertyName => $propertyDetails) {
-            $propertyReflection = $reflection->getProperty($propertyName);
-            $propertyReflection->setAccessible(true);
-            $propertyReflection->setValue($entity, $data->$propertyName);
-            $propertyReflection->setAccessible(false);
-        }
+        $entityMetadata = new EntityMetadata($entity, $entityMapping);
+        $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
         
         return $entity;
+    }
+    
+    public function populateEntity($entity, $data)
+    {
+        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
+        
+        foreach($entityMetadata->getProperties() as $propertyName) {
+            $entityMetadata->setPropertyValue($propertyName, $data->$propertyName);
+        }
     }
 }

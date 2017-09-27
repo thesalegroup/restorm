@@ -40,6 +40,7 @@ class QueryBuilder
      * @var EntityManager
      */
     private $entityManager;
+    private $entity;
 
     /**
      * @var string
@@ -91,30 +92,36 @@ class QueryBuilder
         return $this->action(Query::METHOD_GET, $entityClass);
     }
 
-    public function post(string $entityClass): self
+    public function post($entity): self
     {
-        return $this->action(Query::METHOD_POST, $entityClass);
+        return $this->action(Query::METHOD_POST, $entity);
     }
 
-    public function put(string $entityClass): self
+    public function put($entity): self
     {
-        return $this->action(Query::METHOD_PUT, $entityClass);
+        return $this->action(Query::METHOD_PUT, $entity);
     }
 
-    public function patch(string $entityClass): self
+    public function patch($entity): self
     {
-        return $this->action(Query::METHOD_PATCH, $entityClass);
+        return $this->action(Query::METHOD_PATCH, $entity);
     }
 
-    public function delete(string $entityClass): self
+    public function delete($entity): self
     {
-        return $this->action(Query::METHOD_DELETE, $entityClass);
+        return $this->action(Query::METHOD_DELETE, $entity);
     }
 
-    public function action(string $method, string $entityClass): self
+    public function action(string $method, $entity): self
     {
         $this->method = $method;
-        $this->entityClass = $entityClass;
+
+        if (is_object($entity)) {
+            $this->entity = $entity;
+            $this->entityClass = get_class($entity);
+        } else {
+            $this->entityClass = $entity;
+        }
 
         return $this;
     }
@@ -154,32 +161,38 @@ class QueryBuilder
 
         $isSingle = array_key_exists($entityMapping->getIdentifierName(), $this->filter);
 
-        switch ($this->method) {
-            case Query::METHOD_GET && $isSingle:
+        switch (true) {
+            case $this->method === Query::METHOD_GET && $isSingle:
                 $pathLabel = EntityMapping::PATH_GET;
                 break;
-            case Query::METHOD_GET && !$isSingle:
+            case $this->method === Query::METHOD_GET && !$isSingle:
                 $pathLabel = EntityMapping::PATH_LIST;
                 break;
-            case Query::METHOD_PATCH:
+            case $this->method === Query::METHOD_PATCH:
                 $pathLabel = EntityMapping::PATH_PATCH;
                 break;
-            case Query::METHOD_PUT:
+            case $this->method === Query::METHOD_PUT:
                 $pathLabel = EntityMapping::PATH_PUT;
                 break;
-            case Query::METHOD_POST:
+            case $this->method === Query::METHOD_POST:
                 $pathLabel = EntityMapping::PATH_POST;
                 break;
-            case Query::METHOD_DELETE:
+            case $this->method === Query::METHOD_DELETE:
                 $pathLabel = EntityMapping::PATH_DELETE;
                 break;
         }
-        $path = $entityMapping->getpath($pathLabel);
 
-        if ($isSingle) {
-            $path = sprintf('%s/%s', rtrim($path, '/'), ltrim($this->filter[$entityMapping->getIdentifierName()], '/'));
-            unset($this->filter[$entityMapping->getIdentifierName()]);
-        }
+        $path = preg_replace_callback('/{([^}]*)}/', function($matches) {
+
+            if ($this->method === Query::METHOD_GET) {
+                return $this->filter[$matches[1]];
+
+            } else {
+                $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($this->entity);
+
+                return $entityMetadata->getPropertyValue($matches[1]);
+            }
+        }, $entityMapping->getpath($pathLabel));
 
         return $path;
     }

@@ -28,6 +28,7 @@ namespace Robwasripped\Restorm;
 use Robwasripped\Restorm\Configuration\Configuration;
 use Robwasripped\Restorm\Mapping\EntityMappingRegister;
 use Robwasripped\Restorm\Connection\ConnectionRegister;
+use Robwasripped\Restorm\Entity\EntityMetadataRegister;
 use Robwasripped\Restorm\Mapping\EntityBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Robwasripped\Restorm\EntityStore;
@@ -57,6 +58,11 @@ class EntityManager
     protected $entityMappingRegister;
 
     /**
+     * @var EntityMetadataRegister
+     */
+    protected $entityMetadataRegister;
+
+    /**
      *
      * @var ConnectionRegister
      */
@@ -80,21 +86,22 @@ class EntityManager
      */
     protected $entityStore;
 
-    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EntityBuilder $entityBuilder, EventDispatcherInterface $eventDispatcher)
+    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
-        $this->entityBuilder = $entityBuilder;
         $this->eventDispatcher = $eventDispatcher;
         $this->repositoryRegister = new RepositoryRegister;
-        $this->entityStore = new EntityStore($this->entityMappingRegister);
-        
+        $this->entityMetadataRegister = new EntityMetadataRegister;
+        $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
+        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister);
+
         $this->eventDispatcher->addSubscriber($this->entityStore);
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEntityBuilder(), $configuration->getEventDispatcher());
+        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEventDispatcher());
     }
 
     public function getRepository($entity): EntityRepository
@@ -127,6 +134,11 @@ class EntityManager
         return $this->connectionRegister;
     }
 
+    public function getEntityMetadataRegister(): EntityMetadataRegister
+    {
+        return $this->entityMetadataRegister;
+    }
+
     public function getEntityBuilder(): EntityBuilder
     {
         return $this->entityBuilder;
@@ -142,22 +154,28 @@ class EntityManager
         $knownState = $this->entityStore->getEntityData($entity);
 
         // Filter only mapped fields
-        $mappedProperties = $this->entityMappingRegister->getEntityMapping(get_class($entity))->getProperties();
-        $mappedKnownState = array_intersect_key((array)$knownState, $mappedProperties);
-        
+        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
+        $writableProperties = $entityMetadata->getWritableProperties();
+        $mappedKnownState = array_intersect(array_keys((array) $knownState), $writableProperties);
+
         // Get normalised entity
         $currentState = array();
-        foreach($mappedProperties as $propertyName => $property) {
-            $reflection = new \ReflectionClass($entity);
-            $propertyReflection = $reflection->getProperty($propertyName);
-            $propertyReflection->setAccessible(true);
-            $currentState[$propertyName] = $propertyReflection->getValue($entity);
+        foreach ($writableProperties as $propertyName) {
+            $currentState[$propertyName] = $entityMetadata->getPropertyValue($propertyName);
         }
-        
+
         // Diff arrays to find changes
         $changes = array_diff($currentState, $mappedKnownState);
+
+        if (!$changes) {
+            return;
+        }
+
         // Build query and set array as body of PATCH request
-        
-        // Run query
+        $queryBuilder = new Query\QueryBuilder($this);
+        $queryBuilder->patch($entity)
+            ->setData($changes)
+            ->getQuery()
+            ->getResult();
     }
 }
