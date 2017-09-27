@@ -23,9 +23,9 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace TheSaleGroup\Restorm;
 
-use Robwasripped\Restorm\Query\Query;
+use TheSaleGroup\Restorm\Query\Query;
 
 /**
  * Description of PaginatedCollection

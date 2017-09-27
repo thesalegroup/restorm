@@ -16,7 +16,7 @@ connections:
 entity_mappings:
     Project\Entity\Post:
         connection: default
-        repository_class: Robwasripped\Restorm\EntityRepository
+        repository_class: TheSaleGroup\Restorm\EntityRepository
         paths:
             GET: /posts
             POST: /category/{{category.id}}/posts

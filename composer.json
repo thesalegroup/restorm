@@ -1,5 +1,5 @@
 {
-    "name": "robwasripped/restorm",
+    "name": "thesalegroup/restorm",
     "description": "REST ORM",
     "license": "MIT",
     "authors": [
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Robwasripped\\Restorm\\": "src"
+            "TheSaleGroup\\Restorm\\": "src"
         }
     }
 }

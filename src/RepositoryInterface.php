@@ -23,9 +23,9 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace TheSaleGroup\Restorm;
 
-use Robwasripped\Restorm\EntityManager;
+use TheSaleGroup\Restorm\EntityManager;
 
 /**
  *

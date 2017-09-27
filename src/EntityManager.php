@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace TheSaleGroup\Restorm;
 
-use Robwasripped\Restorm\Configuration\Configuration;
-use Robwasripped\Restorm\Mapping\EntityMappingRegister;
-use Robwasripped\Restorm\Connection\ConnectionRegister;
-use Robwasripped\Restorm\Entity\EntityMetadataRegister;
-use Robwasripped\Restorm\Mapping\EntityBuilder;
+use TheSaleGroup\Restorm\Configuration\Configuration;
+use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
+use TheSaleGroup\Restorm\Connection\ConnectionRegister;
+use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
+use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Robwasripped\Restorm\EntityStore;
+use TheSaleGroup\Restorm\EntityStore;
 
 /**
  * Description of EntityManager

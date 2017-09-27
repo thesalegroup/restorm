@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Connection;
+namespace TheSaleGroup\Restorm\Connection;
 
-use Robwasripped\Restorm\Query\Query;
-use Robwasripped\Restorm\Cache\EntityStore;
+use TheSaleGroup\Restorm\Query\Query;
+use TheSaleGroup\Restorm\Cache\EntityStore;
 
 /**
  * Description of CacheConnection

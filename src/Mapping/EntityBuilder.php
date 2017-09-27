@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Mapping;
+namespace TheSaleGroup\Restorm\Mapping;
 
-use Robwasripped\Restorm\Mapping\EntityMappingRegister;
-use Robwasripped\Restorm\Entity\EntityMetadataRegister;
-use Robwasripped\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
+use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
+use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityBuilder

@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Query;
+namespace TheSaleGroup\Restorm\Query;
 
-use Robwasripped\Restorm\Connection\ConnectionInterface;
+use TheSaleGroup\Restorm\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Robwasripped\Restorm\Mapping\EntityBuilder;
-use Robwasripped\Restorm\EntityCollection;
-use Robwasripped\Restorm\PaginatedCollection;
-use Robwasripped\Restorm\Event\PreBuildEvent;
-use Robwasripped\Restorm\Event\PostBuildEvent;
+use TheSaleGroup\Restorm\Mapping\EntityBuilder;
+use TheSaleGroup\Restorm\EntityCollection;
+use TheSaleGroup\Restorm\PaginatedCollection;
+use TheSaleGroup\Restorm\Event\PreBuildEvent;
+use TheSaleGroup\Restorm\Event\PostBuildEvent;
 
 /**
  * Description of Query

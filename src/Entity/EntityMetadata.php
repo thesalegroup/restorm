@@ -23,9 +23,9 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Entity;
+namespace TheSaleGroup\Restorm\Entity;
 
-use Robwasripped\Restorm\Mapping\EntityMapping;
+use TheSaleGroup\Restorm\Mapping\EntityMapping;
 
 /**
  * Description of EntityMetadata

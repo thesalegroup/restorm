@@ -23,14 +23,14 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace TheSaleGroup\Restorm;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Robwasripped\Restorm\Mapping\EntityMappingRegister;
-use Robwasripped\Restorm\Event\PreBuildEvent;
-use Robwasripped\Restorm\Event\PostBuildEvent;
-use Robwasripped\Restorm\Entity\EntityMetadataRegister;
-use Robwasripped\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
+use TheSaleGroup\Restorm\Event\PreBuildEvent;
+use TheSaleGroup\Restorm\Event\PostBuildEvent;
+use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
+use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityCache

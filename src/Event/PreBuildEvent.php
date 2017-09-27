@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Event;
+namespace TheSaleGroup\Restorm\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 

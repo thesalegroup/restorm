@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Query;
+namespace TheSaleGroup\Restorm\Query;
 
-use Robwasripped\Restorm\EntityManager;
-use Robwasripped\Restorm\Query\Query;
-use Robwasripped\Restorm\Mapping\EntityMapping;
+use TheSaleGroup\Restorm\EntityManager;
+use TheSaleGroup\Restorm\Query\Query;
+use TheSaleGroup\Restorm\Mapping\EntityMapping;
 
 /**
  * Description of QueryBuilder

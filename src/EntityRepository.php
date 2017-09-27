@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm;
+namespace TheSaleGroup\Restorm;
 
-use Robwasripped\Restorm\EntityManager;
-use Robwasripped\Restorm\Query\QueryBuilder;
+use TheSaleGroup\Restorm\EntityManager;
+use TheSaleGroup\Restorm\Query\QueryBuilder;
 
 /**
  * Description of Repository

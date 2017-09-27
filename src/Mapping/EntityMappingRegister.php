@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-namespace Robwasripped\Restorm\Mapping;
+namespace TheSaleGroup\Restorm\Mapping;
 
 /**
  * Description of EntityMappingRegister
