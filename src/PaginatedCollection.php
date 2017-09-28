@@ -40,7 +40,7 @@ class PaginatedCollection extends EntityCollection
     private $originalQuery;
     private $previousPage;
 
-    function __construct(Query $query)
+    public function __construct(Query $query)
     {
         $this->originalQuery = $query;
         $this->previousPage = $query->getPage() ?: 1;

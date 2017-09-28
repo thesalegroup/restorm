@@ -101,7 +101,7 @@ class EntityMapping
         return $this->connection;
     }
 
-    function getProperties()
+    public function getProperties()
     {
         return $this->properties;
     }

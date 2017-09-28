@@ -48,7 +48,7 @@ class EntityBuilder
      */
     private $entityMetadataRegister;
 
-    function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
+    public function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->entityMetadataRegister = $entityMetadataRegister;
