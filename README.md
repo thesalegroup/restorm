@@ -1,4 +1,4 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/43e5874d-c0f0-4047-ba54-2a3046f4c6fb/mini.png)](https://insight.sensiolabs.com/projects/43e5874d-c0f0-4047-ba54-2a3046f4c6fb)
+[![SensioLabsInsight](https://insight.sensiol[![SensioLabsInsight](https://insight.sensiolabs.com/projects/3db69428-3a60-4452-98cd-03f23f388e22/mini.png)](https://insight.sensiolabs.com/projects/3db69428-3a60-4452-98cd-03f23f388e22)
 [![Build Status](https://travis-ci.org/thesalegroup/restorm.svg?branch=master)](https://travis-ci.org/thesalegroup/restorm)
 
 # RESTORM
