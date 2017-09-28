@@ -39,7 +39,6 @@ class GuzzleConnection implements ConnectionInterface
      * @var Client
      */
     private $guzzleClient;
-    private $uri;
     private $config;
 
     public function __construct(array $config)

@@ -77,11 +77,6 @@ class QueryBuilder
      */
     private $perPage = 0;
 
-    /**
-     * @var string
-     */
-    private $path;
-
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
