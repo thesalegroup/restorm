@@ -153,28 +153,39 @@ class EntityManager
     {
         $knownState = $this->entityStore->getEntityData($entity);
 
-        // Filter only mapped fields
-        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
-        $writableProperties = $entityMetadata->getWritableProperties();
-        $mappedKnownState = array_intersect(array_keys((array) $knownState), $writableProperties);
+        $queryBuilder = new Query\QueryBuilder($this);
 
-        // Get normalised entity
-        $currentState = array();
-        foreach ($writableProperties as $propertyName) {
-            $currentState[$propertyName] = $entityMetadata->getPropertyValue($propertyName);
-        }
+        if ($knownState) {
+            // Filter only mapped fields
+            $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
+            $writableProperties = $entityMetadata->getWritableProperties();
+            $mappedKnownState = array_intersect_key((array) $knownState, array_flip($writableProperties));
 
-        // Diff arrays to find changes
-        $changes = array_diff($currentState, $mappedKnownState);
+            // Get normalised entity
+            $currentState = $entityMetadata->getWritablePropertyValues();
 
-        if (!$changes) {
-            return;
+            // Diff arrays to find changes
+            $queryData = array_diff($currentState, $mappedKnownState);
+
+            if (!$queryData) {
+                return;
+            }
+
+            $queryBuilder->patch($entity);
+        } else {
+            $entityMetadata = new Entity\EntityMetadata($entity, $this->entityMappingRegister->getEntityMapping(get_class($entity)));
+            $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
+
+            $writableProperties = $entityMetadata->getWritableProperties();
+
+            $queryData = $entityMetadata->getWritablePropertyValues();
+
+            $queryBuilder->post($entity);
         }
 
         // Build query and set array as body of PATCH request
-        $queryBuilder = new Query\QueryBuilder($this);
-        $queryBuilder->patch($entity)
-            ->setData($changes)
+        $queryBuilder
+            ->setData($queryData)
             ->getQuery()
             ->getResult();
     }

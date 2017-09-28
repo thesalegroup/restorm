@@ -53,7 +53,7 @@ class EntityStore implements EventSubscriberInterface
      * @var array
      */
     private $entityInstances;
-    
+
     /**
      * @var EntityMetadataRegister
      */
@@ -100,7 +100,7 @@ class EntityStore implements EventSubscriberInterface
     public function cacheEntity(PostBuildEvent $event)
     {
         $entityClass = get_class($event->getEntity());
-        
+
         $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($event->getEntity());
 
         $identifier = $entityMetadata->getIdentifierValue();
@@ -120,7 +120,9 @@ class EntityStore implements EventSubscriberInterface
 
     private function getEntityIdentifier($entity)
     {
-        return $this->entityMetadataRegister->getEntityMetadata($entity)->getIdentifierValue();
+        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
+
+        return $entityMetadata ? $entityMetadata->getIdentifierValue() : null;
     }
 
     private function getEntityIdentifierName(string $entityClass): string

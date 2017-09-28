@@ -80,24 +80,35 @@ class EntityMetadata
 
         return $reflectionProperty->getValue($this->entity);
     }
-    
+
     public function getProperties(): array
     {
         $properties = $this->entityMapping->getProperties();
-        
+
         return array_keys($properties);
     }
-    
+
+    public function getWritablePropertyValues(): array
+    {
+        $writablePropertyValues = array();
+
+        foreach ($this->getWritableProperties() as $propertyName) {
+            $writablePropertyValues[$propertyName] = $this->getPropertyValue($propertyName);
+        }
+
+        return $writablePropertyValues;
+    }
+
     public function getWritableProperties(): array
     {
         $writableProperties = array();
-        
-        foreach($this->entityMapping->getProperties() as $propertyName => $propertyOptions) {
-            if(!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] == false) {
+
+        foreach ($this->entityMapping->getProperties() as $propertyName => $propertyOptions) {
+            if (!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] == false) {
                 $writableProperties[] = $propertyName;
             }
         }
-        
+
         return $writableProperties;
     }
 }
