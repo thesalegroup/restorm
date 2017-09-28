@@ -31,8 +31,6 @@ use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityBuilder
- * 
- * @todo Use an EntityMetadata instance to build an entity
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
