@@ -104,7 +104,7 @@ class EntityMetadata
         $writableProperties = array();
 
         foreach ($this->entityMapping->getProperties() as $propertyName => $propertyOptions) {
-            if (!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] == false) {
+            if (!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] === false) {
                 $writableProperties[] = $propertyName;
             }
         }
