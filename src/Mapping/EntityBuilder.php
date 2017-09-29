@@ -28,6 +28,7 @@ namespace TheSaleGroup\Restorm\Mapping;
 use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
 use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\Normalizer\Normalizer;
 
 /**
  * Description of EntityBuilder
@@ -45,11 +46,17 @@ class EntityBuilder
      * @var EntityMetadataRegister
      */
     private $entityMetadataRegister;
+    
+    /**
+     * @var Normalizer
+     */
+    private $normalizer;
 
-    public function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
+    public function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister, Normalizer $normalizer)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->entityMetadataRegister = $entityMetadataRegister;
+        $this->normalizer = $normalizer;
     }
 
     public function buildEntity(string $entityClass)
@@ -63,12 +70,10 @@ class EntityBuilder
         return $entity;
     }
     
-    public function populateEntity($entity, $data)
+    public function populateEntity($entity, \stdClass $data)
     {
         $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
         
-        foreach($entityMetadata->getProperties() as $propertyName) {
-            $entityMetadata->setPropertyValue($propertyName, $data->$propertyName);
-        }
+        return $this->normalizer->denormalize($data, $entityMetadata);
     }
 }
