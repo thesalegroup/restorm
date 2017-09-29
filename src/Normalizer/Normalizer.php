@@ -88,7 +88,7 @@ class Normalizer
     private function getTransformer($type): TransformerInterface
     {
         if (!array_key_exists($type, $this->transformers)) {
-            throw new Exception\UnknownTransformerException(sprintf('No transformer for type "%s" exists.', $propertyType));
+            throw new Exception\UnknownTransformerException(sprintf('No transformer for type "%s" exists.', $type));
         }
 
         return $this->transformers[$type];
