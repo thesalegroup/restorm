@@ -29,6 +29,7 @@ use Symfony\Component\Yaml\Yaml;
 use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
 use TheSaleGroup\Restorm\Mapping\EntityMapping;
 use TheSaleGroup\Restorm\Connection\ConnectionRegister;
+use TheSaleGroup\Restorm\Normalizer\Transformer\TransformerInterface;
 use TheSaleGroup\Restorm\Connection\GuzzleConnection;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -60,6 +61,11 @@ class Configuration
     private $connectionRegister;
 
     /**
+     * @var TransformerInterface[]
+     */
+    private $dataTransformers = array();
+
+    /**
      * @var EventDispatcher
      */
     private $eventDispatcher;
@@ -86,6 +92,7 @@ class Configuration
     {
         $this->entityMappingRegister = $this->buildEntityMappingRegister();
         $this->connectionRegister = $this->buildConnectionRegister();
+        $this->dataTransformers = $this->buildDataTransformers();
         $this->eventDispatcher = new EventDispatcher;
     }
 
@@ -97,6 +104,11 @@ class Configuration
     public function getConnectionRegister(): ConnectionRegister
     {
         return $this->connectionRegister;
+    }
+
+    public function getDataTransformers(): array
+    {
+        return $this->dataTransformers;
     }
 
     public function getEventDispatcher(): EventDispatcher
@@ -131,5 +143,16 @@ class Configuration
         }
 
         return $connectionRegister;
+    }
+
+    private function buildDataTransformers(): array
+    {
+        $transformers = array();
+
+        foreach ($this->configuration['transformers'] as $transformerType => $transformerClass) {
+            $transformers[$transformerType] = new $transformerClass;
+        }
+
+        return $transformers;
     }
 }

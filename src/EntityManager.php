@@ -28,6 +28,7 @@ namespace TheSaleGroup\Restorm;
 use TheSaleGroup\Restorm\Configuration\Configuration;
 use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
 use TheSaleGroup\Restorm\Connection\ConnectionRegister;
+use TheSaleGroup\Restorm\Normalizer\Normalizer;
 use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -86,7 +87,7 @@ class EntityManager
      */
     protected $entityStore;
 
-    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, EventDispatcherInterface $eventDispatcher)
+    protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, array $dataTransformers, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityMappingRegister = $entityMappingRegister;
         $this->connectionRegister = $connectionRegister;
@@ -94,14 +95,16 @@ class EntityManager
         $this->repositoryRegister = new RepositoryRegister;
         $this->entityMetadataRegister = new EntityMetadataRegister;
         $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
-        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister);
+        
+        $normalizer = new Normalizer($dataTransformers);
+        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $normalizer);
 
         $this->eventDispatcher->addSubscriber($this->entityStore);
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getEventDispatcher());
+        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getDataTransformers(), $configuration->getEventDispatcher());
     }
 
     public function getRepository($entity): EntityRepository

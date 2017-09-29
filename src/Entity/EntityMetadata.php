@@ -111,4 +111,9 @@ class EntityMetadata
 
         return $writableProperties;
     }
+
+    public function getEntityMapping(): EntityMapping
+    {
+        return $this->entityMapping;
+    }
 }
