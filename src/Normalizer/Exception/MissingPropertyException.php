@@ -25,6 +25,7 @@
 
 namespace TheSaleGroup\Restorm\Normalizer\Exception;
 
+use Exception;
 use TheSaleGroup\Restorm\Exception\RestormException;
 
 /**
@@ -32,7 +33,6 @@ use TheSaleGroup\Restorm\Exception\RestormException;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class MissingPropertyException implements RestormException
+class MissingPropertyException extends Exception implements RestormException
 {
-    
 }
