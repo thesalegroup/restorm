@@ -67,7 +67,7 @@ class Normalizer
     public function denormalize(\stdClass $data, EntityMetadata $entityMetadata)
     {
         foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
-            $mapFrom = isset($propertyOptions['map_from']) ? $propertyOptions['map_from'] : $propertyName;
+            $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
             if (!property_exists($data, $mapFrom)) {
                 throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the response.', $mapFrom));
