@@ -96,7 +96,7 @@ class EntityManager
         $this->entityMetadataRegister = new EntityMetadataRegister;
         $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
         
-        $normalizer = new Normalizer($dataTransformers);
+        $normalizer = new Normalizer($this, $dataTransformers);
         $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $normalizer);
 
         $this->eventDispatcher->addSubscriber($this->entityStore);

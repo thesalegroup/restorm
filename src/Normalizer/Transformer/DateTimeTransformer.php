@@ -33,12 +33,12 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 class DateTimeTransformer implements TransformerInterface
 {
 
-    public function denormalize($value)
+    public function denormalize($value, array $options)
     {
         return new \DateTime($value);
     }
 
-    public function normalize($value)
+    public function normalize($value, array $options)
     {
         if (!$value instanceof \DateTimeInterface) {
             throw new \InvalidArgumentException;

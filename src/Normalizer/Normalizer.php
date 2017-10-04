@@ -25,7 +25,9 @@
 
 namespace TheSaleGroup\Restorm\Normalizer;
 
+use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Normalizer\Transformer\TransformerInterface;
+use TheSaleGroup\Restorm\Normalizer\Transformer\AdvancedTransformerInterface;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
@@ -36,13 +38,25 @@ use TheSaleGroup\Restorm\Entity\EntityMetadata;
 class Normalizer
 {
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var TransformerInterface[]
      */
     private $transformers;
 
-    public function __construct(array $transformers)
+    public function __construct(EntityManager $entityManager, array $transformers)
     {
+        $this->entityManager = $entityManager;
         $this->transformers = $transformers;
+        
+        foreach($transformers as $transformer) {
+            if($transformer instanceof AdvancedTransformerInterface) {
+                $transformer->setEntityManager($entityManager);
+            }
+        }
     }
 
     public function normalize(EntityMetadata $entityMetadata): \stdClass
@@ -56,7 +70,7 @@ class Normalizer
 
             $transformer = $this->getTransformer($propertyType);
 
-            $normalizedValue = $transformer->normalize($propertyValue);
+            $normalizedValue = $transformer->normalize($propertyValue, $propertyOptions);
 
             $normalizedEntity->$propertyName = $normalizedValue;
         }
@@ -78,7 +92,7 @@ class Normalizer
 
             $transformer = $this->getTransformer($propertyType);
 
-            $denormalizedValue = $transformer->denormalize($dataValue);
+            $denormalizedValue = $transformer->denormalize($dataValue, $propertyOptions);
 
             $entityMetadata->setPropertyValue($propertyName, $denormalizedValue);
         }
