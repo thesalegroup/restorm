@@ -26,6 +26,8 @@
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
 use TheSaleGroup\Restorm\EntityManager;
+use TheSaleGroup\Restorm\Event\PreBuildEvent;
+use TheSaleGroup\Restorm\Entity\Agent;
 
 /**
  * Description of EntityTransformer
@@ -38,15 +40,31 @@ class EntityTransformer implements AdvancedTransformerInterface
      * @var EntityManager
      */
     private $entityManager;
-    
+
     public function denormalize($value, array $options)
     {
+        $entityClass = $options['entity'];
+        $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
+        $identifierName = $entityMapping->getIdentifierName();
+        $data = (object) [$identifierName => $value];
+
+        $entity = $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
+        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity);
+        $entityRepository = $this->entityManager->getRepository($entity);
+
+        $agent = new Agent($entityMetadata, $entityRepository, $entity);
+
+        return $agent;
     }
 
     public function normalize($value, array $options)
     {
-        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
-        return $entityMetadata->getIdentifierValue();
+        if ($value instanceof Agent) {
+            return $value->getIdentifierValue();
+        } else {
+            $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
+            return $entityMetadata->getIdentifierValue();
+        }
     }
 
     public function setEntityManager(EntityManager $entityManager): void

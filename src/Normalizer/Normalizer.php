@@ -51,9 +51,9 @@ class Normalizer
     {
         $this->entityManager = $entityManager;
         $this->transformers = $transformers;
-        
-        foreach($transformers as $transformer) {
-            if($transformer instanceof AdvancedTransformerInterface) {
+
+        foreach ($transformers as $transformer) {
+            if ($transformer instanceof AdvancedTransformerInterface) {
                 $transformer->setEntityManager($entityManager);
             }
         }
@@ -78,13 +78,18 @@ class Normalizer
         return $normalizedEntity;
     }
 
-    public function denormalize(\stdClass $data, EntityMetadata $entityMetadata)
+    public function denormalize(\stdClass $data, EntityMetadata $entityMetadata, bool $partialData = false)
     {
         foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
             if (!property_exists($data, $mapFrom)) {
-                throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the response.', $mapFrom));
+
+                if ($partialData) {
+                    continue;
+                } else {
+                    throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the data.', $mapFrom));
+                }
             }
 
             $propertyType = $propertyOptions['type'];

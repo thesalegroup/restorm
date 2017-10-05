@@ -95,9 +95,9 @@ class EntityManager
         $this->repositoryRegister = new RepositoryRegister;
         $this->entityMetadataRegister = new EntityMetadataRegister;
         $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
-        
+
         $normalizer = new Normalizer($this, $dataTransformers);
-        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $normalizer);
+        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $normalizer, $this->eventDispatcher);
 
         $this->eventDispatcher->addSubscriber($this->entityStore);
     }
@@ -150,6 +150,11 @@ class EntityManager
     public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
+    }
+
+    public function getEntityStore(): EntityStore
+    {
+        return $this->entityStore;
     }
 
     public function persist($entity)

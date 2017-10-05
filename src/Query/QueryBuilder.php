@@ -197,9 +197,8 @@ class QueryBuilder
         $endpoint = $this->getEndpoint();
         $connections = $this->entityManager->getConnectionRegister()->getConnections($this->getEntityMapping($this->entityClass)->getConnection());
         $entityBuilder = $this->entityManager->getEntityBuilder();
-        $eventDispatcher = $this->entityManager->getEventDispatcher();
 
-        return new Query($connections, $eventDispatcher, $entityBuilder, $this->entityClass, $endpoint, $this->method, $this->data, $this->filter, $this->page, $this->perPage, $this->sort);
+        return new Query($connections, $entityBuilder, $this->entityClass, $endpoint, $this->method, $this->data, $this->filter, $this->page, $this->perPage, $this->sort);
     }
 
     private function getEntityMapping(string $entityClass): EntityMapping
