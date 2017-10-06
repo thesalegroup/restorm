@@ -49,7 +49,7 @@ class EntityMapping
     /**
      * @var string
      */
-    private $indentifier;
+    private $identifier;
 
     public function __construct(string $entityClass, string $repositoryName, array $properties, array $paths, string $connection)
     {
@@ -72,7 +72,7 @@ class EntityMapping
 
     public function getIdentifierName()
     {
-        if (!$this->indentifier) {
+        if (!$this->identifier) {
 
             foreach ($this->properties as $propertyName => $property) {
 
@@ -80,15 +80,15 @@ class EntityMapping
                     continue;
                 }
 
-                if ($this->indentifier) {
+                if ($this->identifier) {
                     throw new \Exception('Cannot have more than one identifier per entity');
                 }
 
-                $this->indentifier = $propertyName;
+                $this->identifier = $propertyName;
             }
         }
 
-        return $this->indentifier;
+        return $this->identifier;
     }
 
     public function getpath($method)
