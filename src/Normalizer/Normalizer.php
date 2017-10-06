@@ -42,7 +42,7 @@ class Normalizer
      */
     private $transformers;
 
-    public function __construct(array $transformers)
+    public function __construct(EntityManager $entityManager, array $transformers)
     {
         $this->transformers = $transformers;
 
