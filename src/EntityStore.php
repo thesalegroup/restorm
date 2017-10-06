@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
 use TheSaleGroup\Restorm\Event\PreBuildEvent;
 use TheSaleGroup\Restorm\Event\PostBuildEvent;
+use TheSaleGroup\Restorm\Event\PrePersistEvent;
+use TheSaleGroup\Restorm\Event\PopulatedEntityEventInterface;
 use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
@@ -58,6 +60,7 @@ class EntityStore implements EventSubscriberInterface
      * @var EntityMetadataRegister
      */
     private $entityMetadataRegister;
+    private $newEntity;
 
     public function __construct(EntityMappingRegister $entityMappingRegister, EntityMetadataRegister $entityMetadataRegister)
     {
@@ -75,6 +78,9 @@ class EntityStore implements EventSubscriberInterface
             PostBuildEvent::NAME => [
                 ['cacheEntity', 0],
             ],
+            PrePersistEvent::NAME => [
+                ['storeNewEntity', 0],
+            ]
         );
     }
 
@@ -88,6 +94,13 @@ class EntityStore implements EventSubscriberInterface
 
     public function findExistingEntity(PreBuildEvent $event)
     {
+        if ($this->newEntity) {
+            $event->setEntity($this->newEntity);
+            $this->newEntity = null;
+
+            return;
+        }
+
         $entityIdentifierName = $this->getEntityIdentifierName($event->getEntityClass());
 
         $identifier = $event->getData()->$entityIdentifierName;
@@ -97,11 +110,16 @@ class EntityStore implements EventSubscriberInterface
         }
     }
 
-    public function cacheEntity(PostBuildEvent $event)
+    public function cacheEntity(PopulatedEntityEventInterface $event)
     {
         $entityClass = get_class($event->getEntity());
 
-        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($event->getEntity());
+        if (!$this->entityMetadataRegister->getEntityMetadata($event->getEntity())) {
+            $entityMetadata = new EntityMetadata($event->getEntity(), $this->entityMappingRegister->getEntityMapping($entityClass));
+            $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
+        } else {
+            $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($event->getEntity());
+        }
 
         $identifier = $entityMetadata->getIdentifierValue();
 
@@ -110,6 +128,11 @@ class EntityStore implements EventSubscriberInterface
         }
 
         $this->entityInstances[$entityClass][$identifier] = $event->getEntity();
+    }
+
+    public function storeNewEntity(PrePersistEvent $event)
+    {
+        $this->newEntity = $event->getEntity();
     }
 
     public function getEntityData($entity)

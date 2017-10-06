@@ -44,12 +44,12 @@ class EntityBuilder
      * @var EntityMappingRegister
      */
     private $entityMappingRegister;
-    
+
     /**
      * @var EntityMetadataRegister
      */
     private $entityMetadataRegister;
-    
+
     /**
      * @var Normalizer
      */
@@ -67,14 +67,14 @@ class EntityBuilder
         $this->normalizer = $normalizer;
         $this->eventDispatcher = $eventDispatcher;
     }
-    
+
     public function buildEntity(string $entityClass, $entityData, bool $partialData = false)
     {
         $preBuildEvent = new PreBuildEvent($entityClass, $entityData);
         $this->eventDispatcher->dispatch(PreBuildEvent::NAME, $preBuildEvent);
-        
+
         $entity = $preBuildEvent->getEntity() ?: $this->createEntity($entityClass);
-        
+
         $this->populateEntity($entity, $preBuildEvent->getData(), $partialData);
 
         $postBuildEvent = new PostBuildEvent($entity);
@@ -86,18 +86,18 @@ class EntityBuilder
     private function createEntity(string $entityClass)
     {
         $entityMapping = $this->entityMappingRegister->getEntityMapping($entityClass);
-        
+
         $entity = new $entityClass;
         $entityMetadata = new EntityMetadata($entity, $entityMapping);
         $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
-        
+
         return $entity;
     }
-    
+
     private function populateEntity($entity, \stdClass $data, bool $partialData = false)
     {
         $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
-        
+
         return $this->normalizer->denormalize($data, $entityMetadata, $partialData);
     }
 }

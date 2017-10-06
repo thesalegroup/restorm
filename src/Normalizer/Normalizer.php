@@ -63,7 +63,12 @@ class Normalizer
     {
         $normalizedEntity = new \stdClass;
 
-        foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
+        $writableFieldNames = $entityMetadata->getWritableProperties();
+        $properties = $entityMetadata->getEntityMapping()->getProperties();
+
+        $writableProperties = array_intersect_key($properties, array_flip($writableFieldNames));
+
+        foreach ($writableProperties as $propertyName => $propertyOptions) {
 
             $propertyType = $propertyOptions['type'];
             $propertyValue = $entityMetadata->getPropertyValue($propertyName);

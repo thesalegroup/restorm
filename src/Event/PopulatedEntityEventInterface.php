@@ -25,26 +25,11 @@
 
 namespace TheSaleGroup\Restorm\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
- * Description of PostBuildEvent
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class PostBuildEvent extends Event implements PopulatedEntityEventInterface
+interface PopulatedEntityEventInterface
 {
-    const NAME = 'restorm.post_build';
-
-    private $entity;
-
-    public function __construct($entity)
-    {
-        $this->entity = $entity;
-    }
-
-    public function getEntity()
-    {
-        return $this->entity;
-    }
+    public function getEntity();
 }

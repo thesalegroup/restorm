@@ -28,13 +28,13 @@ namespace TheSaleGroup\Restorm\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Description of PostBuildEvent
+ * Description of PrePersistEvent
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class PostBuildEvent extends Event implements PopulatedEntityEventInterface
+class PrePersistEvent extends Event implements PopulatedEntityEventInterface
 {
-    const NAME = 'restorm.post_build';
+    const NAME = 'pre_persist';
 
     private $entity;
 

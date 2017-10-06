@@ -33,6 +33,7 @@ use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TheSaleGroup\Restorm\EntityStore;
+use TheSaleGroup\Restorm\Event\PrePersistEvent;
 
 /**
  * Description of EntityManager
@@ -87,6 +88,11 @@ class EntityManager
      */
     protected $entityStore;
 
+    /**
+     * @var Normalizer
+     */
+    protected $normalizer;
+
     protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, array $dataTransformers, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityMappingRegister = $entityMappingRegister;
@@ -96,8 +102,8 @@ class EntityManager
         $this->entityMetadataRegister = new EntityMetadataRegister;
         $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
 
-        $normalizer = new Normalizer($this, $dataTransformers);
-        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $normalizer, $this->eventDispatcher);
+        $this->normalizer = new Normalizer($this, $dataTransformers);
+        $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $this->normalizer, $this->eventDispatcher);
 
         $this->eventDispatcher->addSubscriber($this->entityStore);
     }
@@ -159,6 +165,9 @@ class EntityManager
 
     public function persist($entity)
     {
+        $prePersistEvent = new PrePersistEvent($entity);
+        $this->eventDispatcher->dispatch(PrePersistEvent::NAME, $prePersistEvent);
+
         $knownState = $this->entityStore->getEntityData($entity);
 
         $queryBuilder = new Query\QueryBuilder($this);
@@ -170,7 +179,7 @@ class EntityManager
             $mappedKnownState = array_intersect_key((array) $knownState, array_flip($writableProperties));
 
             // Get normalised entity
-            $currentState = $entityMetadata->getWritablePropertyValues();
+            $currentState = (array) $this->normalizer->normalize($entityMetadata);
 
             // Diff arrays to find changes
             $queryData = array_diff($currentState, $mappedKnownState);
