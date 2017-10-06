@@ -34,7 +34,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class PrePersistEvent extends Event implements PopulatedEntityEventInterface
 {
-    const NAME = 'pre_persist';
+    const NAME = 'restorm.pre_persist';
 
     private $entity;
 
