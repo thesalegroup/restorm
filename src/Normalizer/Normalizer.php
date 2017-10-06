@@ -38,18 +38,12 @@ use TheSaleGroup\Restorm\Entity\EntityMetadata;
 class Normalizer
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var TransformerInterface[]
      */
     private $transformers;
 
-    public function __construct(EntityManager $entityManager, array $transformers)
+    public function __construct(array $transformers)
     {
-        $this->entityManager = $entityManager;
         $this->transformers = $transformers;
 
         foreach ($transformers as $transformer) {
