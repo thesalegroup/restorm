@@ -23,16 +23,13 @@
  * THE SOFTWARE.
  */
 
-namespace TheSaleGroup\Restorm\Normalizer\Transformer;
+namespace TheSaleGroup\Restorm\Event;
 
 /**
- * Description of TransformerInterface
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-interface TransformerInterface
+interface PopulatedEntityEventInterface
 {
-    public function normalize($value, array $options);
-    
-    public function denormalize($value, array $options);
+    public function getEntity();
 }

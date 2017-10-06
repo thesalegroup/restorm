@@ -33,12 +33,12 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 class FloatTransformer implements TransformerInterface
 {
 
-    public function denormalize($value)
+    public function denormalize($value, array $options)
     {
         return (float) $value;
     }
 
-    public function normalize($value)
+    public function normalize($value, array $options)
     {
         return (float) $value;
     }

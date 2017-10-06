@@ -25,7 +25,9 @@
 
 namespace TheSaleGroup\Restorm\Normalizer;
 
+use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Normalizer\Transformer\TransformerInterface;
+use TheSaleGroup\Restorm\Normalizer\Transformer\AdvancedTransformerInterface;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
@@ -43,20 +45,31 @@ class Normalizer
     public function __construct(array $transformers)
     {
         $this->transformers = $transformers;
+
+        foreach ($transformers as $transformer) {
+            if ($transformer instanceof AdvancedTransformerInterface) {
+                $transformer->setEntityManager($entityManager);
+            }
+        }
     }
 
     public function normalize(EntityMetadata $entityMetadata): \stdClass
     {
         $normalizedEntity = new \stdClass;
 
-        foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
+        $writableFieldNames = $entityMetadata->getWritableProperties();
+        $properties = $entityMetadata->getEntityMapping()->getProperties();
+
+        $writableProperties = array_intersect_key($properties, array_flip($writableFieldNames));
+
+        foreach ($writableProperties as $propertyName => $propertyOptions) {
 
             $propertyType = $propertyOptions['type'];
             $propertyValue = $entityMetadata->getPropertyValue($propertyName);
 
             $transformer = $this->getTransformer($propertyType);
 
-            $normalizedValue = $transformer->normalize($propertyValue);
+            $normalizedValue = $transformer->normalize($propertyValue, $propertyOptions);
 
             $normalizedEntity->$propertyName = $normalizedValue;
         }
@@ -64,13 +77,18 @@ class Normalizer
         return $normalizedEntity;
     }
 
-    public function denormalize(\stdClass $data, EntityMetadata $entityMetadata)
+    public function denormalize(\stdClass $data, EntityMetadata $entityMetadata, bool $partialData = false)
     {
         foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
             if (!property_exists($data, $mapFrom)) {
-                throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the response.', $mapFrom));
+
+                if ($partialData) {
+                    continue;
+                } else {
+                    throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the data.', $mapFrom));
+                }
             }
 
             $propertyType = $propertyOptions['type'];
@@ -78,7 +96,7 @@ class Normalizer
 
             $transformer = $this->getTransformer($propertyType);
 
-            $denormalizedValue = $transformer->denormalize($dataValue);
+            $denormalizedValue = $transformer->denormalize($dataValue, $propertyOptions);
 
             $entityMetadata->setPropertyValue($propertyName, $denormalizedValue);
         }

@@ -25,14 +25,13 @@
 
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
+use TheSaleGroup\Restorm\EntityManager;
+
 /**
- * Description of TransformerInterface
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-interface TransformerInterface
+interface AdvancedTransformerInterface extends TransformerInterface
 {
-    public function normalize($value, array $options);
-    
-    public function denormalize($value, array $options);
+    public function setEntityManager(EntityManager $entityManager): void;
 }

@@ -25,25 +25,50 @@
 
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
+use TheSaleGroup\Restorm\EntityManager;
+use TheSaleGroup\Restorm\Event\PreBuildEvent;
+use TheSaleGroup\Restorm\Entity\Agent;
+
 /**
- * Description of DateTimeTransformer
+ * Description of EntityTransformer
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class DateTimeTransformer implements TransformerInterface
+class EntityTransformer implements AdvancedTransformerInterface
 {
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
 
     public function denormalize($value, array $options)
     {
-        return new \DateTime($value);
+        $entityClass = $options['entity'];
+        $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
+        $identifierName = $entityMapping->getIdentifierName();
+        $data = (object) [$identifierName => $value];
+
+        $entity = $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
+        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity);
+        $entityRepository = $this->entityManager->getRepository($entity);
+
+        $agent = new Agent($entityMetadata, $entityRepository, $entity);
+
+        return $agent;
     }
 
     public function normalize($value, array $options)
     {
-        if (!$value instanceof \DateTimeInterface) {
-            throw new \InvalidArgumentException;
+        if ($value instanceof Agent) {
+            return $value->getIdentifierValue();
+        } else {
+            $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
+            return $entityMetadata->getIdentifierValue();
         }
-        
-        return $value->format(\DateTime::ISO8601);
+    }
+
+    public function setEntityManager(EntityManager $entityManager): void
+    {
+        $this->entityManager = $entityManager;
     }
 }

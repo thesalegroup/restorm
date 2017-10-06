@@ -26,12 +26,9 @@
 namespace TheSaleGroup\Restorm\Query;
 
 use TheSaleGroup\Restorm\Connection\ConnectionInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use TheSaleGroup\Restorm\EntityCollection;
 use TheSaleGroup\Restorm\PaginatedCollection;
-use TheSaleGroup\Restorm\Event\PreBuildEvent;
-use TheSaleGroup\Restorm\Event\PostBuildEvent;
 
 /**
  * Description of Query
@@ -91,11 +88,6 @@ class Query
     private $connections;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * @var EntityBuilder
      */
     private $entityBuilder;
@@ -105,10 +97,9 @@ class Query
      */
     private $entityClass;
 
-    public function __construct(array $connections, EventDispatcherInterface $eventDispatcher, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
+    public function __construct(array $connections, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
     {
         $this->connections = $connections;
-        $this->eventDispatcher = $eventDispatcher;
         $this->entityBuilder = $entityBuilder;
         $this->entityClass = $entityClass;
         $this->setPath($path);
@@ -148,17 +139,7 @@ class Query
 
     private function buildEntity($entityData)
     {
-        $preBuildEvent = new PreBuildEvent($this->entityClass, $entityData);
-        $this->eventDispatcher->dispatch(PreBuildEvent::NAME, $preBuildEvent);
-        
-        $entity = $preBuildEvent->getEntity() ?: $this->entityBuilder->buildEntity($this->entityClass);
-        
-        $this->entityBuilder->populateEntity($entity, $preBuildEvent->getData());
-
-        $postBuildEvent = new PostBuildEvent($entity);
-        $this->eventDispatcher->dispatch(PostBuildEvent::NAME, $postBuildEvent);
-
-        return $entity;
+        return $this->entityBuilder->buildEntity($this->entityClass, $entityData);
     }
 
     public function getMethod()

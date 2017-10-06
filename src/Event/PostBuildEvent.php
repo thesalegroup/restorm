@@ -32,7 +32,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class PostBuildEvent extends Event
+class PostBuildEvent extends Event implements PopulatedEntityEventInterface
 {
     const NAME = 'restorm.post_build';
 
@@ -46,10 +46,5 @@ class PostBuildEvent extends Event
     public function getEntity()
     {
         return $this->entity;
-    }
-
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
     }
 }

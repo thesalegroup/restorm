@@ -23,16 +23,28 @@
  * THE SOFTWARE.
  */
 
-namespace TheSaleGroup\Restorm\Normalizer\Transformer;
+namespace TheSaleGroup\Restorm\Event;
+
+use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Description of TransformerInterface
+ * Description of PrePersistEvent
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-interface TransformerInterface
+class PrePersistEvent extends Event implements PopulatedEntityEventInterface
 {
-    public function normalize($value, array $options);
-    
-    public function denormalize($value, array $options);
+    const NAME = 'pre_persist';
+
+    private $entity;
+
+    public function __construct($entity)
+    {
+        $this->entity = $entity;
+    }
+
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 }

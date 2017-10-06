@@ -23,16 +23,56 @@
  * THE SOFTWARE.
  */
 
-namespace TheSaleGroup\Restorm\Normalizer\Transformer;
+namespace TheSaleGroup\Restorm\Entity;
+
+use TheSaleGroup\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\EntityRepository;
 
 /**
- * Description of TransformerInterface
+ * Description of Agent
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-interface TransformerInterface
+class Agent
 {
-    public function normalize($value, array $options);
+    /**
+     * @var EntityMetadata
+     */
+    private $entityMetadata;
+
+    /**
+     * @var EntityRepository
+     */
+    private $entityRepository;
+
+    /**
+     * @var mixed
+     */
+    private $entity = false;
+
+    public function __construct(EntityMetadata $entityMetadata, EntityRepository $entityRepository, $entity)
+    {
+        $this->entityMetadata = $entityMetadata;
+        $this->entityRepository = $entityRepository;
+        $this->entity = $entity;
+    }
+
+    public function getIdentifierValue()
+    {
+        return $this->entityMetadata->getIdentifierValue();
+    }
+
+    public function getEntity()
+    {
+        if ($this->entity === false) {
+            $this->entity = $this->entityRepository->findOne($this->entityMetadata->getIdentifierValue());
+        }
+
+        return $this->entity;
+    }
     
-    public function denormalize($value, array $options);
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+    }
 }
