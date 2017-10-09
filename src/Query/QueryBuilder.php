@@ -153,8 +153,8 @@ class QueryBuilder
     private function getEndpoint()
     {
         $entityMapping = $this->getEntityMapping($this->entityClass);
-
-        $isSingle = array_key_exists($entityMapping->getIdentifierName(), $this->filter);
+        $identifierName = $entityMapping->getIdentifierName();
+        $isSingle = array_key_exists($identifierName, $this->filter);
 
         switch (true) {
             case $this->method === Query::METHOD_GET && $isSingle:
@@ -177,11 +177,15 @@ class QueryBuilder
                 break;
         }
 
-        $path = preg_replace_callback('/{([^}]*)}/', function($matches) {
-
+        $path = preg_replace_callback('/{([^}]*)}/', function($matches) use ($identifierName) {
             if ($this->method === Query::METHOD_GET) {
-                return $this->filter[$matches[1]];
+                $key = $matches[1];
+                $value = $this->filter[$key];
 
+                if ($key === $identifierName) {
+                    unset($this->filter[$identifierName]);
+                }
+                return $value;
             } else {
                 $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($this->entity);
 
