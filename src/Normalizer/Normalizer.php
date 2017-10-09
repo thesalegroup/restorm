@@ -63,6 +63,7 @@ class Normalizer
         $writableProperties = array_intersect_key($properties, array_flip($writableFieldNames));
 
         foreach ($writableProperties as $propertyName => $propertyOptions) {
+            $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
             $propertyType = $propertyOptions['type'];
             $propertyValue = $entityMetadata->getPropertyValue($propertyName);
@@ -71,7 +72,7 @@ class Normalizer
 
             $normalizedValue = $transformer->normalize($propertyValue, $propertyOptions);
 
-            $normalizedEntity->$propertyName = $normalizedValue;
+            $normalizedEntity->$mapFrom = $normalizedValue;
         }
 
         return $normalizedEntity;
