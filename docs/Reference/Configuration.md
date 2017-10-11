@@ -60,7 +60,7 @@ need, whereas others may want to connection to version 2 of an API:
 
 ```YAML
 connections:
-    APIv1:
+    APIv2:
         base_uri: https://example.com/api/v2/
 ```
 
