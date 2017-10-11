@@ -57,7 +57,7 @@ class GuzzleConnection implements ConnectionInterface
         $options = array();
 
         if ($this->config['filter_mode'] === 'query') {
-            $options['query'] = $query->getFilter();
+            $options['query'] = $this->buildQuery($query->getFilter());
         }
 
         $options['body'] = json_encode($query->getData());
@@ -74,5 +74,14 @@ class GuzzleConnection implements ConnectionInterface
         $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
 
         return json_decode($response->getBody()->getContents());
+    }
+    
+    private function buildQuery(array $filters): array
+    {
+        return array_map(function($value) {
+            $nullValue = $this->config['null_value'] ?? '\0';
+            
+            return is_null($value) ? $nullValue : $value;
+        }, $filters);
     }
 }
