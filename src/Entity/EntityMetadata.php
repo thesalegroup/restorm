@@ -92,7 +92,7 @@ class EntityMetadata
     {
         $writablePropertyValues = array();
 
-        foreach ($this->getWritableProperties() as $propertyName) {
+        foreach ($this->getWritableProperties() as $propertyName => $propertyOptions) {
             $writablePropertyValues[$propertyName] = $this->getPropertyValue($propertyName);
         }
 
@@ -105,7 +105,7 @@ class EntityMetadata
 
         foreach ($this->entityMapping->getProperties() as $propertyName => $propertyOptions) {
             if (!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] === false) {
-                $writableProperties[] = $propertyName;
+                $writableProperties[$propertyName] = $propertyOptions;
             }
         }
 
