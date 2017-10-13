@@ -79,7 +79,7 @@ class GuzzleConnection implements ConnectionInterface
     private function buildQuery(array $filters): array
     {
         return array_map(function($value) {
-            $nullValue = $this->config['null_value'] ?? '\0';
+            $nullValue = $this->config['null_value'] ?? "\000";
             
             return is_null($value) ? $nullValue : $value;
         }, $filters);
