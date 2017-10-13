@@ -5,4 +5,13 @@
 
 # RESTORM
 
-A REST ORM library for persisting data via an HTTP REST API.
+A REST ORM library for persisting data via an HTTP REST API. Inspired by Doctrine,
+RESTORM provides an entity manager to take care of persisting your entities to
+a REST API.
+
+
+# Installation
+
+To install RESTORM, run the following composer command:
+
+```composer install thesalegroup/restorm```
