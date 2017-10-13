@@ -32,7 +32,7 @@ use TheSaleGroup\Restorm\Exception\RestormException;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class UnknownPropertyTypeException implements RestormException
+class UnknownPropertyTypeException extends \Exception implements RestormException
 {
     
 }

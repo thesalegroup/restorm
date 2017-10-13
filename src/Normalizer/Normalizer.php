@@ -57,10 +57,7 @@ class Normalizer
     {
         $normalizedEntity = new \stdClass;
 
-        $writableFieldNames = $entityMetadata->getWritableProperties();
-        $properties = $entityMetadata->getEntityMapping()->getProperties();
-
-        $writableProperties = array_intersect_key($properties, array_flip($writableFieldNames));
+        $writableProperties = $entityMetadata->getWritableProperties();
 
         foreach ($writableProperties as $propertyName => $propertyOptions) {
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
@@ -68,9 +65,23 @@ class Normalizer
             $propertyType = $propertyOptions['type'];
             $propertyValue = $entityMetadata->getPropertyValue($propertyName);
 
-            $transformer = $this->getTransformer($propertyType);
+            if ($propertyType === 'object') {
+                $normalizedValue = new \stdClass;
 
-            $normalizedValue = $transformer->normalize($propertyValue, $propertyOptions);
+                foreach ($propertyValue as $dataName => $dataValue) {
+                    $dataType = $this->inferType($dataValue);
+
+                    $transformer = $this->getTransformer($dataType);
+                    $normalizedDataValue = $transformer->normalize($dataValue, []);
+
+                    $normalizedValue->$dataName = $normalizedDataValue;
+                }
+            } else {
+
+                $transformer = $this->getTransformer($propertyType);
+
+                $normalizedValue = $transformer->normalize($propertyValue, $propertyOptions);
+            }
 
             $normalizedEntity->$mapFrom = $normalizedValue;
         }
@@ -93,11 +104,25 @@ class Normalizer
             }
 
             $propertyType = $propertyOptions['type'];
-            $dataValue = $data->$mapFrom;
+            $propertyValue = $data->$mapFrom;
 
-            $transformer = $this->getTransformer($propertyType);
+            if ($propertyType === 'object') {
+                $denormalizedValue = new \stdClass;
 
-            $denormalizedValue = $transformer->denormalize($dataValue, $propertyOptions);
+                foreach ($propertyValue as $dataName => $dataValue) {
+                    $dataType = $this->inferType($dataValue);
+
+                    $transformer = $this->getTransformer($dataType);
+                    $denormalizedDataValue = $transformer->denormalize($dataValue, []);
+
+                    $denormalizedValue->$dataName = $denormalizedDataValue;
+                }
+            } else {
+
+                $transformer = $this->getTransformer($propertyType);
+
+                $denormalizedValue = $transformer->denormalize($propertyValue, $propertyOptions);
+            }
 
             $entityMetadata->setPropertyValue($propertyName, $denormalizedValue);
         }
@@ -112,5 +137,19 @@ class Normalizer
         }
 
         return $this->transformers[$type];
+    }
+
+    private function inferType($value): string
+    {
+        switch ($type = gettype($value)) {
+            case 'boolean':
+            case 'integer':
+            case 'string':
+                return $type;
+            case 'double':
+                return 'float';
+            default:
+                throw new Exception\UnknownPropertyTypeException;
+        }
     }
 }

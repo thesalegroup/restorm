@@ -176,13 +176,22 @@ class EntityManager
             // Filter only mapped fields
             $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
             $writableProperties = $entityMetadata->getWritableProperties();
-            $mappedKnownState = array_intersect_key((array) $knownState, array_flip($writableProperties));
 
             // Get normalised entity
             $currentState = (array) $this->normalizer->normalize($entityMetadata);
+            $mappedCurrentState = array_intersect_key($currentState, $writableProperties);
 
             // Diff arrays to find changes
-            $queryData = array_diff($currentState, $mappedKnownState);
+            $queryData = array_udiff_assoc($mappedCurrentState, (array) $knownState, function($current, $known) {
+
+                if (gettype($current) !== gettype($known)) {
+                    return 1;
+                } elseif (is_object($current)) {
+                    return (int) ($current != $known);
+                } else {
+                    return (int) ($current !== $known);
+                }
+            });
 
             if (!$queryData) {
                 return;
@@ -192,8 +201,6 @@ class EntityManager
         } else {
             $entityMetadata = new Entity\EntityMetadata($entity, $this->entityMappingRegister->getEntityMapping(get_class($entity)));
             $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
-
-            $writableProperties = $entityMetadata->getWritableProperties();
 
             $queryData = $entityMetadata->getWritablePropertyValues();
 
