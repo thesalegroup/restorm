@@ -77,8 +77,12 @@ class Configuration
         $this->initialise();
     }
 
-    public static function buildFromYaml(string $filePath)
+    public static function buildFromYaml(string $filePath): Configuration
     {
+        if (self::$instance) {
+            throw new Exception\ConfigurationAlreadyInitialisedException('A configuration object has already been created.');
+        }
+
         if (!file_exists($filePath)) {
             throw new \Exception(sprintf('The configuration file "%s" cannot be found.', $filePath));
         }
@@ -86,6 +90,15 @@ class Configuration
         $configurationArray = Yaml::parse(file_get_contents($filePath), Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
 
         return self::$instance = new Configuration($configurationArray);
+    }
+
+    public static function buildFromArray(array $configuration): Configuration
+    {
+        if (self::$instance) {
+            throw new Exception\ConfigurationAlreadyInitialisedException('A configuration object has already been created.');
+        }
+
+        return self::$instance = new Configuration($configuration);
     }
 
     private function initialise()
