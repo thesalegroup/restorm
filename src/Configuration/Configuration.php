@@ -100,13 +100,13 @@ class Configuration
 
         return self::$instance = new Configuration($configuration);
     }
-    
+
     public static function getInstance(): Configuration
     {
-        if(!self::$instance) {
+        if (!self::$instance) {
             throw new Exception\ConfigurationUnitialisedException('The configuration has not been initialised.');
         }
-        
+
         return self::$instance;
     }
 
@@ -131,6 +131,11 @@ class Configuration
     public function getDataTransformers(): array
     {
         return $this->dataTransformers;
+    }
+
+    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getEventDispatcher(): EventDispatcher
