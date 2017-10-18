@@ -31,6 +31,7 @@ use TheSaleGroup\Restorm\Mapping\EntityMapping;
 use TheSaleGroup\Restorm\Connection\ConnectionRegister;
 use TheSaleGroup\Restorm\Normalizer\Transformer\TransformerInterface;
 use TheSaleGroup\Restorm\Connection\GuzzleConnection;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
