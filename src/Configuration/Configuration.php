@@ -139,7 +139,7 @@ class Configuration
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function getEventDispatcher(): EventDispatcher
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
