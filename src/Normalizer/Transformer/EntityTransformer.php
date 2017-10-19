@@ -53,12 +53,8 @@ class EntityTransformer implements AdvancedTransformerInterface
 
     public function normalize($value, array $options)
     {
-        if ($value instanceof Agent) {
-            return $value->getIdentifierValue();
-        } else {
-            $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
-            return $entityMetadata->getIdentifierValue();
-        }
+        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
+        return $entityMetadata->getIdentifierValue();
     }
 
     public function setEntityManager(EntityManager $entityManager): void
