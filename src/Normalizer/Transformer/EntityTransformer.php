@@ -28,6 +28,7 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Event\PreBuildEvent;
 use TheSaleGroup\Restorm\Entity\Agent;
+use ProxyManager\Proxy\GhostObjectInterface;
 
 /**
  * Description of EntityTransformer
@@ -49,12 +50,8 @@ class EntityTransformer implements AdvancedTransformerInterface
         $data = (object) [$identifierName => $value];
 
         $entity = $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
-        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity);
-        $entityRepository = $this->entityManager->getRepository($entity);
-
-        $agent = new Agent($entityMetadata, $entityRepository, $entity);
-
-        return $agent;
+        
+        return $entity;
     }
 
     public function normalize($value, array $options)

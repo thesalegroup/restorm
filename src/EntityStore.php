@@ -112,7 +112,7 @@ class EntityStore implements EventSubscriberInterface
 
     public function cacheEntity(PopulatedEntityEventInterface $event)
     {
-        $entityClass = get_class($event->getEntity());
+        $entityClass = $event->getEntityClass();
 
         if (!$this->entityMetadataRegister->getEntityMetadata($event->getEntity())) {
             $entityMetadata = new EntityMetadata($event->getEntity(), $this->entityMappingRegister->getEntityMapping($entityClass));

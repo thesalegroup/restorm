@@ -38,13 +38,24 @@ class PrePersistEvent extends Event implements PopulatedEntityEventInterface
 
     private $entity;
 
-    public function __construct($entity)
+    /**
+     * @var string
+     */
+    private $entityClass;
+
+    public function __construct($entity, string $entityClass)
     {
         $this->entity = $entity;
+        $this->entityClass = $entityClass;
     }
 
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function getEntityClass(): string
+    {
+        return $this->entityClass;
     }
 }
