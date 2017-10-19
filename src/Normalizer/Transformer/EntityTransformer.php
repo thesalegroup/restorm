@@ -26,9 +26,6 @@
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
 use TheSaleGroup\Restorm\EntityManager;
-use TheSaleGroup\Restorm\Event\PreBuildEvent;
-use TheSaleGroup\Restorm\Entity\Agent;
-use ProxyManager\Proxy\GhostObjectInterface;
 
 /**
  * Description of EntityTransformer
