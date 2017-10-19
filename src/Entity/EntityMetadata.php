@@ -51,7 +51,7 @@ class EntityMetadata
         $this->entity = $entity;
         $this->entityMapping = $entityMapping;
 
-        $this->entityReflection = new \ReflectionObject($entity);
+        $this->entityReflection = new \ReflectionClass($entityMapping->getEntityClass());
     }
 
     public function getIdentifierValue()

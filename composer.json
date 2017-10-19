@@ -12,7 +12,8 @@
         "php": "^7.1",
         "guzzlehttp/guzzle": "^6.0",
         "symfony/yaml": "^3",
-        "symfony/event-dispatcher": "^3"
+        "symfony/event-dispatcher": "^3",
+        "ocramius/proxy-manager": "^2.1"
     },
     "autoload": {
         "psr-4": {

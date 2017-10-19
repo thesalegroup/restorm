@@ -70,14 +70,14 @@ class EntityBuilder
 
     public function buildEntity(string $entityClass, $entityData, bool $partialData = false)
     {
-        $preBuildEvent = new PreBuildEvent($entityClass, $entityData);
+        $preBuildEvent = new PreBuildEvent($entityClass, $entityData, $partialData);
         $this->eventDispatcher->dispatch(PreBuildEvent::NAME, $preBuildEvent);
 
         $entity = $preBuildEvent->getEntity() ?: $this->createEntity($entityClass);
 
         $this->populateEntity($entity, $preBuildEvent->getData(), $partialData);
 
-        $postBuildEvent = new PostBuildEvent($entity);
+        $postBuildEvent = new PostBuildEvent($entity, $entityClass);
         $this->eventDispatcher->dispatch(PostBuildEvent::NAME, $postBuildEvent);
 
         return $entity;

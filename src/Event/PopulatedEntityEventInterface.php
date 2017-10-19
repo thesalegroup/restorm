@@ -31,5 +31,8 @@ namespace TheSaleGroup\Restorm\Event;
  */
 interface PopulatedEntityEventInterface
 {
+
     public function getEntity();
+
+    public function getEntityClass(): string;
 }

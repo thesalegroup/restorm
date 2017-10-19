@@ -29,10 +29,12 @@ use TheSaleGroup\Restorm\Configuration\Configuration;
 use TheSaleGroup\Restorm\Mapping\EntityMappingRegister;
 use TheSaleGroup\Restorm\Connection\ConnectionRegister;
 use TheSaleGroup\Restorm\Normalizer\Normalizer;
+use TheSaleGroup\Restorm\Entity\Proxy;
 use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TheSaleGroup\Restorm\EntityStore;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
 use TheSaleGroup\Restorm\Event\PrePersistEvent;
 
 /**
@@ -89,9 +91,19 @@ class EntityManager
     protected $entityStore;
 
     /**
+     * @var LazyLoadingGhostFactory
+     */
+    protected $proxyFactory;
+
+    /**
      * @var Normalizer
      */
     protected $normalizer;
+
+    /**
+     * @var Prozy
+     */
+    protected $proxy;
 
     protected function __construct(EntityMappingRegister $entityMappingRegister, ConnectionRegister $connectionRegister, array $dataTransformers, EventDispatcherInterface $eventDispatcher)
     {
@@ -101,11 +113,14 @@ class EntityManager
         $this->repositoryRegister = new RepositoryRegister;
         $this->entityMetadataRegister = new EntityMetadataRegister;
         $this->entityStore = new EntityStore($this->entityMappingRegister, $this->entityMetadataRegister);
+        $this->proxyFactory = new LazyLoadingGhostFactory;
 
         $this->normalizer = new Normalizer($this, $dataTransformers);
         $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $this->normalizer, $this->eventDispatcher);
+        $this->proxy = new Proxy($this);
 
         $this->eventDispatcher->addSubscriber($this->entityStore);
+        $this->eventDispatcher->addSubscriber($this->proxy);
     }
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
@@ -163,9 +178,20 @@ class EntityManager
         return $this->entityStore;
     }
 
+    public function getProxyFactory(): LazyLoadingGhostFactory
+    {
+        return $this->proxyFactory;
+    }
+
     public function persist($entity)
     {
-        $prePersistEvent = new PrePersistEvent($entity);
+        $entityMapping = $this->entityMappingRegister->findEntityMapping($entity);
+
+        if (!$entityMapping) {
+            throw new Mapping\Exception\UnknownEntityException(get_class($entity));
+        }
+
+        $prePersistEvent = new PrePersistEvent($entity, $entityMapping->getEntityClass());
         $this->eventDispatcher->dispatch(PrePersistEvent::NAME, $prePersistEvent);
 
         $knownState = $this->entityStore->getEntityData($entity);
@@ -199,7 +225,7 @@ class EntityManager
 
             $queryBuilder->patch($entity);
         } else {
-            $entityMetadata = new Entity\EntityMetadata($entity, $this->entityMappingRegister->getEntityMapping(get_class($entity)));
+            $entityMetadata = new Entity\EntityMetadata($entity, $entityMapping);
             $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
 
             $queryData = $entityMetadata->getWritablePropertyValues();

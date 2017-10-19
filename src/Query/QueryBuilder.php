@@ -28,6 +28,7 @@ namespace TheSaleGroup\Restorm\Query;
 use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Query\Query;
 use TheSaleGroup\Restorm\Mapping\EntityMapping;
+use TheSaleGroup\Restorm\Mapping\Exception\UnknownEntityException;
 
 /**
  * Description of QueryBuilder
@@ -46,6 +47,11 @@ class QueryBuilder
      * @var string
      */
     private $entityClass;
+    
+    /**
+     * @var EntityMapping
+     */
+    private $entityMapping;
 
     /**
      * @var string
@@ -113,11 +119,17 @@ class QueryBuilder
 
         if (is_object($entity)) {
             $this->entity = $entity;
-            $this->entityClass = get_class($entity);
-        } else {
-            $this->entityClass = $entity;
         }
+        
+        $entityMapping = $this->entityManager->getEntityMappingRegister()->findEntityMapping($entity);
 
+        if(!$entityMapping) {
+            throw new UnknownEntityException(is_object($entity) ? get_class($entity) : $entity);
+        }
+        
+        $this->entityClass = $entityMapping->getEntityClass();
+        $this->entityMapping = $entityMapping;
+        
         return $this;
     }
 
@@ -152,8 +164,7 @@ class QueryBuilder
 
     private function getEndpoint()
     {
-        $entityMapping = $this->getEntityMapping($this->entityClass);
-        $identifierName = $entityMapping->getIdentifierName();
+        $identifierName = $this->entityMapping->getIdentifierName();
         $isSingle = array_key_exists($identifierName, $this->filter);
 
         switch (true) {
@@ -191,7 +202,7 @@ class QueryBuilder
 
                 return $entityMetadata->getPropertyValue($matches[1]);
             }
-        }, $entityMapping->getpath($pathLabel));
+        }, $this->entityMapping->getpath($pathLabel));
 
         return $path;
     }
@@ -199,14 +210,9 @@ class QueryBuilder
     public function getQuery(): Query
     {
         $endpoint = $this->getEndpoint();
-        $connections = $this->entityManager->getConnectionRegister()->getConnections($this->getEntityMapping($this->entityClass)->getConnection());
+        $connections = $this->entityManager->getConnectionRegister()->getConnections($this->entityMapping->getConnection());
         $entityBuilder = $this->entityManager->getEntityBuilder();
 
         return new Query($connections, $entityBuilder, $this->entityClass, $endpoint, $this->method, $this->data, $this->filter, $this->page, $this->perPage, $this->sort);
-    }
-
-    private function getEntityMapping(string $entityClass): EntityMapping
-    {
-        return $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
     }
 }
