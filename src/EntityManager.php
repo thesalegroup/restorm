@@ -99,7 +99,7 @@ class EntityManager
      * @var Normalizer
      */
     protected $normalizer;
-    
+
     /**
      * @var Prozy
      */
@@ -118,7 +118,7 @@ class EntityManager
         $this->normalizer = new Normalizer($this, $dataTransformers);
         $this->entityBuilder = new EntityBuilder($this->entityMappingRegister, $this->entityMetadataRegister, $this->normalizer, $this->eventDispatcher);
         $this->proxy = new Proxy($this);
-        
+
         $this->eventDispatcher->addSubscriber($this->entityStore);
         $this->eventDispatcher->addSubscriber($this->proxy);
     }
@@ -185,7 +185,13 @@ class EntityManager
 
     public function persist($entity)
     {
-        $prePersistEvent = new PrePersistEvent($entity);
+        $entityMapping = $this->entityMappingRegister->findEntityMapping($entity);
+
+        if (!$entityMapping) {
+            throw new Mapping\Exception\UnknownEntityException(get_class($entity));
+        }
+
+        $prePersistEvent = new PrePersistEvent($entity, $entityMapping->getEntityClass());
         $this->eventDispatcher->dispatch(PrePersistEvent::NAME, $prePersistEvent);
 
         $knownState = $this->entityStore->getEntityData($entity);
@@ -219,7 +225,7 @@ class EntityManager
 
             $queryBuilder->patch($entity);
         } else {
-            $entityMetadata = new Entity\EntityMetadata($entity, $this->entityMappingRegister->getEntityMapping(get_class($entity)));
+            $entityMetadata = new Entity\EntityMetadata($entity, $entityMapping);
             $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
 
             $queryData = $entityMetadata->getWritablePropertyValues();

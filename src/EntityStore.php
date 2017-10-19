@@ -33,6 +33,7 @@ use TheSaleGroup\Restorm\Event\PrePersistEvent;
 use TheSaleGroup\Restorm\Event\PopulatedEntityEventInterface;
 use TheSaleGroup\Restorm\Entity\EntityMetadataRegister;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\Mapping\Exception\UnknownEntityException;
 
 /**
  * Description of EntityCache
@@ -137,7 +138,13 @@ class EntityStore implements EventSubscriberInterface
 
     public function getEntityData($entity)
     {
-        return $this->entityData[get_class($entity)][$this->getEntityIdentifier($entity)]
+        $entityMapping = $this->entityMappingRegister->findEntityMapping($entity);
+        
+        if(!$entityMapping) {
+            throw new UnknownEntityException(get_class($entity));
+        }
+        
+        return $this->entityData[$entityMapping->getEntityClass()][$this->getEntityIdentifier($entity)]
                 ?? null;
     }
 

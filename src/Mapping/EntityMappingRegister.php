@@ -52,4 +52,15 @@ class EntityMappingRegister
 
         return $entityMapping;
     }
+    
+    public function findEntityMapping($entity): ?EntityMapping
+    {
+        foreach($this->entityMappings as $entityMapping) {
+            if(is_a($entity, $entityMapping->getEntityClass(), true)) {
+                return $entityMapping;
+            }
+        }
+        
+        return null;
+    }
 }
