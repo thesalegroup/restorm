@@ -105,4 +105,18 @@ class EntityMapping
     {
         return $this->properties;
     }
+    
+    public function getWritableFields()
+    {
+        $writableFields = array();
+
+        foreach ($this->getProperties() as $propertyName => $propertyOptions) {
+            if (!isset($propertyOptions['read_only']) || $propertyOptions['read_only'] === false) {
+                $fieldName = $propertyOptions['map_from'] ?? $propertyName;
+                $writableFields[$fieldName] = $propertyOptions;
+            }
+        }
+
+        return $writableFields;
+    }
 }
