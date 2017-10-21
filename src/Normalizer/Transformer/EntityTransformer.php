@@ -26,6 +26,9 @@
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
 use TheSaleGroup\Restorm\EntityManager;
+use TheSaleGroup\Restorm\Normalizer\Exception\InvalidValueException;
+use TheSaleGroup\Restorm\Mapping\EntityMapping;
+use TheSaleGroup\Restorm\EntityCollection;
 
 /**
  * Description of EntityTransformer
@@ -43,22 +46,61 @@ class EntityTransformer implements AdvancedTransformerInterface
     {
         $entityClass = $options['entity'];
         $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
-        $identifierName = $entityMapping->getIdentifierName();
-        $data = (object) [$identifierName => $value];
 
-        $entity = $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
-        
-        return $entity;
+        if ($options['multiple'] ?? false) {
+            if (!is_array($value)) {
+                throw new InvalidValueException('The value passed to the entity transformer must be an array if option "multiple" is true.');
+            }
+
+            $entities = array();
+
+            foreach ($value as $entityIdentifierValue) {
+                $entity = $this->buildEntity($entityMapping, $entityIdentifierValue);
+                $entities[] = $entity;
+            }
+
+            return new EntityCollection($entities);
+        } else {
+
+            $entity = $this->buildEntity($entityMapping, $value, true);
+            return $entity;
+        }
     }
 
     public function normalize($value, array $options)
     {
-        $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($value);
-        return $entityMetadata->getIdentifierValue();
+        if ($options['multiple'] ?? false) {
+            if (!$value instanceof EntityCollection) {
+                throw new InvalidValueException('The value passed to the entity transformer must be an EntityCollection instance if option "multiple" is true.');
+            }
+            $entityValues = array();
+            foreach ($value as $entity) {
+                $entityValues[] = $this->getEntityIdentifierValue($entity);
+            }
+
+            return $entityValues;
+        } else {
+            return $this->getEntityIdentifierValue($value);
+        }
     }
 
     public function setEntityManager(EntityManager $entityManager): void
     {
         $this->entityManager = $entityManager;
+    }
+
+    private function buildEntity(EntityMapping $entityMapping, $identifierValue)
+    {
+        $entityClass = $entityMapping->getEntityClass();
+        $identifierName = $entityMapping->getIdentifierName();
+
+        $data = (object) [$identifierName => $identifierValue];
+
+        return $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
+    }
+
+    private function getEntityIdentifierValue($entity)
+    {
+        return $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity)->getIdentifierValue();
     }
 }

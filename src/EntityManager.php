@@ -201,11 +201,11 @@ class EntityManager
         if ($knownState) {
             // Filter only mapped fields
             $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
-            $writableProperties = $entityMetadata->getWritableProperties();
+            $writableFields = $entityMapping->getWritableFields();            
 
             // Get normalised entity
             $currentState = (array) $this->normalizer->normalize($entityMetadata);
-            $mappedCurrentState = array_intersect_key($currentState, $writableProperties);
+            $mappedCurrentState = array_intersect_key($currentState, $writableFields);
 
             // Diff arrays to find changes
             $queryData = array_udiff_assoc($mappedCurrentState, (array) $knownState, function($current, $known) {

@@ -133,6 +133,7 @@ class EntityStore implements EventSubscriberInterface
 
     public function storeNewEntity(PrePersistEvent $event)
     {
+        
         $this->newEntity = $event->getEntity();
     }
 

@@ -38,6 +38,18 @@ class EntityCollection implements \ArrayAccess, \Iterator
      */
     protected $entities;
     
+    public function __construct(array $entities)
+    {
+        $this->entities = $entities;
+    }
+    
+    public function addEntity($entity)
+    {
+        if(!in_array($entity, $this->entities)) {
+            $this->entities[] = $entity;
+        }
+    }
+    
     public function current()
     {
         return current($this->entities);

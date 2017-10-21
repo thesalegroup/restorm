@@ -87,10 +87,10 @@ class Proxy implements EventSubscriberInterface
             array $properties
             ) use ($event) {
             $initializer = null;
-            
+
             $identifierValue = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($ghostObject)->getIdentifierValue();
             $this->entityManager->getRepository($event->getEntityClass())->findOne($identifierValue);
-            
+
             return true;
         };
 
