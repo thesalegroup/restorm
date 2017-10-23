@@ -68,15 +68,30 @@ class Proxy implements EventSubscriberInterface
         );
 
         $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($event->getEntityClass());
-        $properties = $entityMapping->getProperties();
+        $mappedProperties = $entityMapping->getProperties();
 
-        foreach ($properties as $propertyName => $propertyOptions) {
+        $reflectionProperties = (new \ReflectionClass($event->getEntityClass()))->getProperties(\ReflectionProperty::IS_PRIVATE);
+        $properties = array_map(function($reflectionProperty) {
+            return $reflectionProperty->getName();
+        }, $reflectionProperties);
+
+        foreach ($mappedProperties as $propertyName => $propertyOptions) {
             $dataPropertyName = $propertyOptions['map_from'] ?? $propertyName;
             if (!property_exists($event->getData(), $dataPropertyName)) {
+
+                $propertyKey = array_search($propertyName, $properties);
+                if (is_int($propertyKey)) {
+                    unset($properties[$propertyKey]);
+                }
+
                 continue;
             }
 
             $proxyOptions['skippedProperties'][] = $this->getPropertyProxyName($event->getEntityClass(), $dataPropertyName);
+        }
+
+        foreach ($properties as $property) {
+            $proxyOptions['skippedProperties'][] = $this->getPropertyProxyName($event->getEntityClass(), $property);
         }
 
         $initializer = function (

@@ -44,6 +44,10 @@ class EntityTransformer implements AdvancedTransformerInterface
 
     public function denormalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         $entityClass = $options['entity'];
         $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
 

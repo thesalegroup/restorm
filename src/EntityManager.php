@@ -228,7 +228,7 @@ class EntityManager
             $entityMetadata = new Entity\EntityMetadata($entity, $entityMapping);
             $this->entityMetadataRegister->addEntityMetadata($entityMetadata);
 
-            $queryData = $entityMetadata->getWritablePropertyValues();
+            $queryData = (array) $this->normalizer->normalize($entityMetadata);
 
             $queryBuilder->post($entity);
         }
