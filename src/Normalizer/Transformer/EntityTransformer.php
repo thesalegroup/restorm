@@ -73,6 +73,10 @@ class EntityTransformer implements AdvancedTransformerInterface
 
     public function normalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         if ($options['multiple'] ?? false) {
             if (!$value instanceof EntityCollection) {
                 throw new InvalidValueException('The value passed to the entity transformer must be an EntityCollection instance if option "multiple" is true.');
