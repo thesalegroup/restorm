@@ -23,45 +23,18 @@
  * THE SOFTWARE.
  */
 
-namespace TheSaleGroup\Restorm\Entity;
+namespace TheSaleGroup\Restorm\Exception;
 
 /**
- * Description of EntityMetadataRegister
+ * Description of UnrecognisedEntityException
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class EntityMetadataRegister
+class UnrecognisedEntityException extends \Exception implements RestormException
 {
-    /**
-     * @var EntityMetadata[]
-     */
-    private $entiyMetadata = array();
-    
-    public function addEntityMetadata(EntityMetadata $entityMetadata): void
+    public function __construct($entity, int $code = 0, \Throwable $previous = null)
     {
-        $this->entiyMetadata[] = $entityMetadata;
-    }
-    
-    public function hasEntityMetadata(EntityMetadata $entityMetadata): bool
-    {
-        return in_array($entityMetadata, $this->entiyMetadata);
-    }
-    
-    public function getEntityMetadata($entity): ?EntityMetadata
-    {
-        foreach($this->entiyMetadata as $entityMetadata) {
-            if($entityMetadata->getEntity() === $entity) {
-                return $entityMetadata;
-            }
-        }
-        
-        return null;
-    }
-    
-    public function removeEntityMetadata(EntityMetadata $entityMetadata)
-    {
-        if($this->hasEntityMetadata($entityMetadata)) {
-            unset($this->entiyMetadata[array_search($entityMetadata, $this->entiyMetadata, true)]);
-        }
+        $message = sprintf('Argument "%s" is not a recognised entity.', is_object($entity) ? get_class($entity) : gettype($entity));
+        parent::__construct($message, $code, $previous);
     }
 }
