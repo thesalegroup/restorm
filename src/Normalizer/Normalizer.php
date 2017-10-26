@@ -107,7 +107,7 @@ class Normalizer
             $propertyValue = $data->$mapFrom;
 
             if ($propertyType === 'object') {
-                $denormalizedValue = new \stdClass;
+                $denormalizedValue = array();
 
                 foreach ($propertyValue as $dataName => $dataValue) {
                     $dataType = $this->inferType($dataValue);
@@ -115,7 +115,7 @@ class Normalizer
                     $transformer = $this->getTransformer($dataType);
                     $denormalizedDataValue = $transformer->denormalize($dataValue, []);
 
-                    $denormalizedValue->$dataName = $denormalizedDataValue;
+                    $denormalizedValue[$dataName] = $denormalizedDataValue;
                 }
             } else {
 
