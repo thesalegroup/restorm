@@ -239,4 +239,20 @@ class EntityManager
             ->getQuery()
             ->getResult();
     }
+    
+    public function remove($entity)
+    {
+        $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
+        
+        if(!$entityMetadata) {
+            throw new Exception\UnrecognisedEntityException($entity);
+        }
+        
+        $queryBuilder = new Query\QueryBuilder($this);
+        $queryBuilder->delete($entity)
+            ->getQuery()
+            ->getResult();
+        
+        $this->entityMetadataRegister->removeEntityMetadata($entityMetadata);
+    }
 }
