@@ -66,8 +66,8 @@ class Normalizer
             $propertyValue = $entityMetadata->getPropertyValue($propertyName);
 
             if ($propertyType === 'object') {
-                
-                if($propertyValue === null) {
+
+                if ($propertyValue === null) {
                     $normalizedValue = null;
                 } else {
                     $normalizedValue = new \stdClass;
@@ -112,15 +112,20 @@ class Normalizer
             $propertyValue = $data->$mapFrom;
 
             if ($propertyType === 'object') {
-                $denormalizedValue = array();
 
-                foreach ($propertyValue as $dataName => $dataValue) {
-                    $dataType = $this->inferType($dataValue);
+                if ($propertyValue === null) {
+                    $denormalizedValue = null;
+                } else {
+                    $denormalizedValue = array();
 
-                    $transformer = $this->getTransformer($dataType);
-                    $denormalizedDataValue = $transformer->denormalize($dataValue, []);
+                    foreach ($propertyValue as $dataName => $dataValue) {
+                        $dataType = $this->inferType($dataValue);
 
-                    $denormalizedValue[$dataName] = $denormalizedDataValue;
+                        $transformer = $this->getTransformer($dataType);
+                        $denormalizedDataValue = $transformer->denormalize($dataValue, []);
+
+                        $denormalizedValue[$dataName] = $denormalizedDataValue;
+                    }
                 }
             } else {
 
