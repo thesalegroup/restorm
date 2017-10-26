@@ -116,7 +116,7 @@ class Query
         foreach ($this->connections as $connection) {
             $result = $connection->handleQuery($this);
 
-            if (is_null($result) || empty($result)) {
+            if (is_null($result)) {
                 continue;
             }
 
