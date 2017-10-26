@@ -98,4 +98,9 @@ class EntityCollection implements \ArrayAccess, \Iterator
     {
         return $this->offsetExists($this->key());
     }
+    
+    public function isEmpty(): bool
+    {
+        return empty($this->entities);
+    }
 }
