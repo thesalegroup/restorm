@@ -35,11 +35,19 @@ class IntegerTransformer implements TransformerInterface
 
     public function denormalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (int) $value;
     }
 
     public function normalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (int) $value;
     }
 }

@@ -35,15 +35,23 @@ class DateTimeTransformer implements TransformerInterface
 
     public function denormalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return new \DateTime($value);
     }
 
     public function normalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         if (!$value instanceof \DateTimeInterface) {
             throw new \InvalidArgumentException;
         }
-        
+
         return $value->format(\DateTime::ISO8601);
     }
 }

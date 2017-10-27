@@ -35,11 +35,19 @@ class FloatTransformer implements TransformerInterface
 
     public function denormalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (float) $value;
     }
 
     public function normalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (float) $value;
     }
 }

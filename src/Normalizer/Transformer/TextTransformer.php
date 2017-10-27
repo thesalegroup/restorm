@@ -35,11 +35,19 @@ class TextTransformer implements TransformerInterface
 
     public function denormalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (string) $value;
     }
 
     public function normalize($value, array $options)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (string) $value;
     }
 }
