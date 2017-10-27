@@ -103,4 +103,14 @@ class EntityCollection implements \ArrayAccess, \Iterator
     {
         return empty($this->entities);
     }
+    
+    public function contains($entity): bool
+    {
+        return in_array($entity, $this->entities);
+    }
+    
+    public function toArray(): array
+    {
+        return $this->entities;
+    }
 }
