@@ -27,6 +27,7 @@ namespace TheSaleGroup\Restorm\Connection;
 
 use TheSaleGroup\Restorm\Query\Query;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * Description of Connection
@@ -71,7 +72,14 @@ class GuzzleConnection implements ConnectionInterface
             }
         }
 
-        $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
+        try {
+            $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
+        } catch (ClientException $e) {
+            if($e->getResponse()->getStatusCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
