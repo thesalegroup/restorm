@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-namespace Event;
+namespace TheSaleGroup\Restorm\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use TheSaleGroup\Restorm\Query\Query;
