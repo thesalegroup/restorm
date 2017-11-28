@@ -63,6 +63,8 @@ class GuzzleConnection implements ConnectionInterface
 
         $options['body'] = json_encode($query->getData());
 
+        $options['headers'] = $query->getHeaders();
+
         if (isset($this->config['pagination_parameters'])) {
             if ($query->getPage()) {
                 $options['query'][$this->config['pagination_parameters']['page_param']] = $query->getPage();
