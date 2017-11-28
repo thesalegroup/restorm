@@ -166,7 +166,7 @@ class Configuration
         $connectionConfigurations = $this->configuration['connections'] ?? [];
 
         foreach ($connectionConfigurations as $connectionName => $connectionConfiguration) {
-            $connection = new GuzzleConnection($connectionConfiguration);
+            $connection = new GuzzleConnection($connectionConfiguration, $this->eventDispatcher);
             $connectionRegister->registerConnection($connectionName, $connection);
         }
 
