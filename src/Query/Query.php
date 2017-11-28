@@ -85,7 +85,7 @@ class Query
     /**
      * @var array
      */
-    private $headers = ['X-Test' => 'test'];
+    private $headers = [];
 
     /**
      * @var ConnectionInterface[]
