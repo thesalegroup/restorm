@@ -66,7 +66,9 @@ class GuzzleConnection implements ConnectionInterface
     {
         $path = ltrim($query->getPath(), '/');
 
-        $options = array();
+        $this->eventDispatcher->dispatch(PreQueryEvent::NAME, new PreQueryEvent($query));
+
+        $options = [];
 
         if ($this->config['filter_mode'] === 'query') {
             $options['query'] = $this->buildQuery($query->getFilter());
@@ -84,8 +86,6 @@ class GuzzleConnection implements ConnectionInterface
                 $options['query'][$this->config['pagination_parameters']['per_page_param']] = $query->getPerPage();
             }
         }
-
-        $this->eventDispatcher->dispatch(PreQueryEvent::NAME, new PreQueryEvent($query));
 
         try {
             $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
