@@ -71,14 +71,17 @@ class Configuration
      */
     private $eventDispatcher;
 
-    private function __construct(array $configuration)
+    private function __construct(array $configuration, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->configuration = $configuration;
 
-        $this->initialise();
+        $this->eventDispatcher = $eventDispatcher ?: new EventDispatcher;
+        $this->entityMappingRegister = $this->buildEntityMappingRegister();
+        $this->connectionRegister = $this->buildConnectionRegister();
+        $this->dataTransformers = $this->buildDataTransformers();
     }
 
-    public static function buildFromYaml(string $filePath): Configuration
+    public static function buildFromYaml(string $filePath, EventDispatcherInterface $eventDispatcher = null): Configuration
     {
         if (self::$instance) {
             throw new Exception\ConfigurationAlreadyInitialisedException('A configuration object has already been created.');
@@ -90,16 +93,16 @@ class Configuration
 
         $configurationArray = Yaml::parse(file_get_contents($filePath), Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
 
-        return self::$instance = new Configuration($configurationArray);
+        return self::$instance = new Configuration($configurationArray, $eventDispatcher);
     }
 
-    public static function buildFromArray(array $configuration): Configuration
+    public static function buildFromArray(array $configuration, EventDispatcherInterface $eventDispatcher = null): Configuration
     {
         if (self::$instance) {
             throw new Exception\ConfigurationAlreadyInitialisedException('A configuration object has already been created.');
         }
 
-        return self::$instance = new Configuration($configuration);
+        return self::$instance = new Configuration($configuration, $eventDispatcher);
     }
 
     public static function getInstance(): Configuration
@@ -109,14 +112,6 @@ class Configuration
         }
 
         return self::$instance;
-    }
-
-    private function initialise()
-    {
-        $this->eventDispatcher = new EventDispatcher;
-        $this->entityMappingRegister = $this->buildEntityMappingRegister();
-        $this->connectionRegister = $this->buildConnectionRegister();
-        $this->dataTransformers = $this->buildDataTransformers();
     }
 
     public function getEntityMappingRegister(): EntityMappingRegister
