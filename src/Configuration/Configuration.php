@@ -113,10 +113,10 @@ class Configuration
 
     private function initialise()
     {
+        $this->eventDispatcher = new EventDispatcher;
         $this->entityMappingRegister = $this->buildEntityMappingRegister();
         $this->connectionRegister = $this->buildConnectionRegister();
         $this->dataTransformers = $this->buildDataTransformers();
-        $this->eventDispatcher = new EventDispatcher;
     }
 
     public function getEntityMappingRegister(): EntityMappingRegister
@@ -166,7 +166,7 @@ class Configuration
         $connectionConfigurations = $this->configuration['connections'] ?? [];
 
         foreach ($connectionConfigurations as $connectionName => $connectionConfiguration) {
-            $connection = new GuzzleConnection($connectionConfiguration);
+            $connection = new GuzzleConnection($connectionConfiguration, $this->getEventDispatcher());
             $connectionRegister->registerConnection($connectionName, $connection);
         }
 

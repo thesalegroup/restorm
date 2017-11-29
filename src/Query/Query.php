@@ -83,6 +83,11 @@ class Query
     private $path;
 
     /**
+     * @var array
+     */
+    private $headers = [];
+
+    /**
      * @var ConnectionInterface[]
      */
     private $connections;
@@ -177,6 +182,11 @@ class Query
         return $this->path;
     }
 
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
     public function setMethod($method)
     {
         $this->method = $method;
@@ -210,6 +220,11 @@ class Query
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    public function setHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
     }
 
     public function getEntityClass()

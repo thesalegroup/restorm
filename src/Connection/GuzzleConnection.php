@@ -25,6 +25,8 @@
 
 namespace TheSaleGroup\Restorm\Connection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use TheSaleGroup\Restorm\Event\PreQueryEvent;
 use TheSaleGroup\Restorm\Query\Query;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -40,12 +42,21 @@ class GuzzleConnection implements ConnectionInterface
      * @var Client
      */
     private $guzzleClient;
+
+    /**
+     * @var array
+     */
     private $config;
 
-    public function __construct(array $config)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    public function __construct(array $config, EventDispatcherInterface $eventDispatcher)
     {
         $this->config = $config;
-
+        $this->eventDispatcher = $eventDispatcher;
         $this->guzzleClient = new Client([
             'base_uri' => rtrim($config['base_uri'], '/') . '/'
         ]);
@@ -55,13 +66,17 @@ class GuzzleConnection implements ConnectionInterface
     {
         $path = ltrim($query->getPath(), '/');
 
-        $options = array();
+        $this->eventDispatcher->dispatch(PreQueryEvent::NAME, new PreQueryEvent($query));
+
+        $options = [];
 
         if ($this->config['filter_mode'] === 'query') {
             $options['query'] = $this->buildQuery($query->getFilter());
         }
 
         $options['body'] = json_encode($query->getData());
+
+        $options['headers'] = $query->getHeaders();
 
         if (isset($this->config['pagination_parameters'])) {
             if ($query->getPage()) {
