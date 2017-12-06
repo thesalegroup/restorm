@@ -71,7 +71,7 @@ class Proxy implements EventSubscriberInterface
         $mappedProperties = $entityMapping->getProperties();
 
         $reflectionProperties = (new \ReflectionClass($event->getEntityClass()))->getProperties(\ReflectionProperty::IS_PRIVATE);
-        $properties = array_map(function($reflectionProperty) {
+        $properties = array_map(function(\ReflectionProperty $reflectionProperty) {
             return $reflectionProperty->getName();
         }, $reflectionProperties);
 

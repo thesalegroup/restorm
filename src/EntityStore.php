@@ -133,20 +133,20 @@ class EntityStore implements EventSubscriberInterface
 
     public function storeNewEntity(PrePersistEvent $event)
     {
-        
-        $this->newEntity = $event->getEntity();
+        $entity = $event->getEntity();
+        $this->newEntity = $this->getEntityData($entity) ? null : $entity;
     }
 
     public function getEntityData($entity)
     {
         $entityMapping = $this->entityMappingRegister->findEntityMapping($entity);
-        
-        if(!$entityMapping) {
+
+        if (!$entityMapping) {
             throw new UnknownEntityException(get_class($entity));
         }
-        
+
         return $this->entityData[$entityMapping->getEntityClass()][$this->getEntityIdentifier($entity)]
-                ?? null;
+            ?? null;
     }
 
     private function getEntityIdentifier($entity)
