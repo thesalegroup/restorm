@@ -168,10 +168,10 @@ class QueryBuilder
         $isSingle = array_key_exists($identifierName, $this->filter);
 
         switch (true) {
-            case!$isSingle:
+            case !$isSingle:
                 $pathLabel = EntityMapping::PATH_LIST;
                 break;
-            case $this->method === Query::METHOD_GET && $isSingle:
+            case $this->method === Query::METHOD_GET:
                 $pathLabel = EntityMapping::PATH_GET;
                 break;
             case $this->method === Query::METHOD_PATCH:
