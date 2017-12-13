@@ -47,7 +47,7 @@ class QueryBuilder
      * @var string
      */
     private $entityClass;
-    
+
     /**
      * @var EntityMapping
      */
@@ -120,16 +120,16 @@ class QueryBuilder
         if (is_object($entity)) {
             $this->entity = $entity;
         }
-        
+
         $entityMapping = $this->entityManager->getEntityMappingRegister()->findEntityMapping($entity);
 
-        if(!$entityMapping) {
+        if (!$entityMapping) {
             throw new UnknownEntityException(is_object($entity) ? get_class($entity) : $entity);
         }
-        
+
         $this->entityClass = $entityMapping->getEntityClass();
         $this->entityMapping = $entityMapping;
-        
+
         return $this;
     }
 
@@ -168,11 +168,11 @@ class QueryBuilder
         $isSingle = array_key_exists($identifierName, $this->filter);
 
         switch (true) {
+            case!$isSingle:
+                $pathLabel = EntityMapping::PATH_LIST;
+                break;
             case $this->method === Query::METHOD_GET && $isSingle:
                 $pathLabel = EntityMapping::PATH_GET;
-                break;
-            case $this->method === Query::METHOD_GET && !$isSingle:
-                $pathLabel = EntityMapping::PATH_LIST;
                 break;
             case $this->method === Query::METHOD_PATCH:
                 $pathLabel = EntityMapping::PATH_PATCH;
@@ -189,19 +189,20 @@ class QueryBuilder
         }
 
         $path = preg_replace_callback('/{([^}]*)}/', function($matches) use ($identifierName) {
-            if ($this->method === Query::METHOD_GET) {
-                $key = $matches[1];
-                $value = $this->filter[$key];
 
-                if ($key === $identifierName) {
-                    unset($this->filter[$identifierName]);
-                }
-                return $value;
-            } else {
-                $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($this->entity);
+            $entityMetadata = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($this->entity);
 
+            if ($entityMetadata) {
                 return $entityMetadata->getPropertyValue($matches[1]);
             }
+
+            $key = $matches[1];
+            $value = $this->filter[$key];
+
+            if ($key === $identifierName) {
+                unset($this->filter[$identifierName]);
+            }
+            return $value;
         }, $this->entityMapping->getpath($pathLabel));
 
         return $path;

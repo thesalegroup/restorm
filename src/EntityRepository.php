@@ -83,6 +83,15 @@ class EntityRepository implements RepositoryInterface
             ->getResult();
     }
     
+    public function remove(array $filters)
+    {
+        return $this->getQueryBuilder()
+            ->delete($this->entityClass)
+            ->where($filters)
+            ->getQuery()
+            ->getResult();
+    }
+    
     protected function getQueryBuilder(): QueryBuilder
     {
         return new QueryBuilder($this->entityManager);
