@@ -30,13 +30,14 @@ use TheSaleGroup\Restorm\Event\PreQueryEvent;
 use TheSaleGroup\Restorm\Query\Query;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Description of Connection
  *
  * @author Rob Treacy <email@roberttreacy.com>
  */
-class GuzzleConnection implements ConnectionInterface
+class GuzzleConnection implements ConnectionInterface, PaginatedConnectionInterface
 {
     /**
      * @var Client
@@ -52,6 +53,24 @@ class GuzzleConnection implements ConnectionInterface
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $totalResultsSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $currentPageResultsSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $currentPage;
 
     public function __construct(array $config, EventDispatcherInterface $eventDispatcher)
     {
@@ -90,20 +109,55 @@ class GuzzleConnection implements ConnectionInterface
         try {
             $response = $this->guzzleClient->request($query->getMethod(), $path, $options);
         } catch (ClientException $e) {
-            if($e->getResponse()->getStatusCode() === 404) {
+            if ($e->getResponse()->getStatusCode() === 404) {
                 return null;
             }
             throw $e;
         }
 
+        // Handle pagination data if it's available on this connection
+        if (isset($this->config['pagination_data'])) {
+            $this->retrievePaginationData($this->config['pagination_data'], $response);
+        }
+
         return json_decode($response->getBody()->getContents());
     }
-    
+
+    private function retrievePaginationData(array $paginationSettings, Response $response)
+    {
+        if (isset($paginationSettings['query_total_header'])) {
+            $this->totalResultsSum = (int) $response->getHeaderLine($paginationSettings['query_total_header']);
+        }
+
+        if (isset($paginationSettings['page_total_header'])) {
+            $this->currentPageResultsSum = (int) $response->getHeaderLine($paginationSettings['page_total_header']);
+        }
+
+        if (isset($paginationSettings['current_page_header'])) {
+            $this->currentPage = (int) $response->getHeaderLine($paginationSettings['current_page_header']);
+        }
+    }
+
+    public function getTotalResultsSum(): ?int
+    {
+        return $this->totalResultsSum;
+    }
+
+    public function getCurrentPageResultsSum(): ?int
+    {
+        return $this->currentPageResultsSum;
+    }
+
+    public function getCurrentPage(): ?int
+    {
+        return $this->currentPage;
+    }
+
     private function buildQuery(array $filters): array
     {
         return array_map(function($value) {
             $nullValue = $this->config['null_value'] ?? "\000";
-            
+
             return is_null($value) ? $nullValue : $value;
         }, $filters);
     }

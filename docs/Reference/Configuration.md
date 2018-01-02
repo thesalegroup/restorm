@@ -10,6 +10,10 @@ connections:
         pagination_parameters:
             page_param: page
             per_page_param: per_page
+        pagination_data:
+            query_total_header: X-Pagination-Total
+            page_total_header: X-Pagination-Page-Size
+            current_page_header: X-Pagination-Page
 entity_mappings:
     Project\Entity\Post:
         connection: default
@@ -77,3 +81,17 @@ By giving details of pagination, a `PaginatedCollection` object can be returned
 that is able to lazy load results from each page of a list while iterating.
 `pagination_parameters` takes 2 additional pieces of information - the parameter
 name for page number and the parameter name for the "items per page" count.
+
+
+## Pagination Data
+```YAML
+pagination_data:
+    query_total_header: X-Pagination-Total
+    page_total_header: X-Pagination-Page-Size
+    current_page_header: X-Pagination-Page
+```
+
+If the REST API returns information about the query's pagination, that information
+can be returned in a `PaginatedCollection` object. Currently the pagination is
+expected to be returned as headers, and those header keys can be set in the
+configuration.

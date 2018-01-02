@@ -40,10 +40,32 @@ class PaginatedCollection extends EntityCollection
     private $originalQuery;
     private $previousPage;
 
-    public function __construct(Query $query)
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedTotalItemSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedPageItemSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedCurrentPage;
+
+    public function __construct(Query $query, ?int $totalItemSum = null, ?int $pageItemSum = null, ?int $currentPage = null)
     {
         $this->originalQuery = $query;
         $this->previousPage = $query->getPage() ?: 1;
+
+        $this->expectedTotalItemSum = $totalItemSum;
+        $this->expectedPageItemSum = $pageItemSum;
+        $this->expectedCurrentPage = $currentPage;
     }
 
     public function next(): void
@@ -66,5 +88,20 @@ class PaginatedCollection extends EntityCollection
         foreach ($entityCollection as $entity) {
             $this->entities[] = $entity;
         }
+    }
+
+    public function getExpectedTotalItemSum(): ?int
+    {
+        return $this->expectedTotalItemSum;
+    }
+
+    public function getExpectedPageItemSum(): ?int
+    {
+        return $this->expectedPageItemSum;
+    }
+
+    public function getExpectedCurrentPage(): ?int
+    {
+        return $this->expectedCurrentPage;
     }
 }
