@@ -29,6 +29,7 @@ use TheSaleGroup\Restorm\Connection\ConnectionInterface;
 use TheSaleGroup\Restorm\Mapping\EntityBuilder;
 use TheSaleGroup\Restorm\EntityCollection;
 use TheSaleGroup\Restorm\PaginatedCollection;
+use TheSaleGroup\Restorm\Connection\PaginatedConnectionInterface;
 
 /**
  * Description of Query
@@ -124,10 +125,14 @@ class Query
             if (is_null($result)) {
                 continue;
             }
+            
+            $expectedTotalSum = $connection instanceof PaginatedConnectionInterface ? $connection->getTotalResultsSum() : null;
+            $expectedPageSum = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPageResultsSum() : null;
+            $expectedCurrentPage = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPage() : null;
 
             if (is_array($result)) {
                 $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0)
-                        ? new PaginatedCollection($this) : new EntityCollection;
+                        ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection;
 
                 foreach ($result as $singleResult) {
                     $entityCollection[] = $this->buildEntity($singleResult);
