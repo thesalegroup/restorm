@@ -132,7 +132,7 @@ class Query
 
             if (is_array($result)) {
                 $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0)
-                        ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection;
+                        ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection([], $expectedTotalSum, $expectedPageSum, $expectedCurrentPage);
 
                 foreach ($result as $singleResult) {
                     $entityCollection[] = $this->buildEntity($singleResult);

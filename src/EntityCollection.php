@@ -37,19 +37,41 @@ class EntityCollection implements \ArrayAccess, \Iterator
      * @var array
      */
     protected $entities;
-    
-    public function __construct(array $entities = array())
+
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedTotalItemSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedPageItemSum;
+
+    /**
+     *
+     * @var int|null
+     */
+    private $expectedCurrentPage;
+
+    public function __construct(array $entities = array(), ?int $totalItemSum = null, ?int $pageItemSum = null, ?int $currentPage = null)
     {
         $this->entities = $entities;
+
+        $this->expectedTotalItemSum = $totalItemSum;
+        $this->expectedPageItemSum = $pageItemSum;
+        $this->expectedCurrentPage = $currentPage;
     }
-    
+
     public function addEntity($entity)
     {
-        if(!in_array($entity, $this->entities)) {
+        if (!in_array($entity, $this->entities)) {
             $this->entities[] = $entity;
         }
     }
-    
+
     public function current()
     {
         return current($this->entities);
@@ -77,7 +99,7 @@ class EntityCollection implements \ArrayAccess, \Iterator
 
     public function offsetSet($offset, $value): void
     {
-        if(is_null($offset)) {
+        if (is_null($offset)) {
             $this->entities[] = $value;
         } else {
             $this->entities[$offset] = $value;
@@ -98,19 +120,34 @@ class EntityCollection implements \ArrayAccess, \Iterator
     {
         return $this->offsetExists($this->key());
     }
-    
+
     public function isEmpty(): bool
     {
         return empty($this->entities);
     }
-    
+
     public function contains($entity): bool
     {
         return in_array($entity, $this->entities);
     }
-    
+
     public function toArray(): array
     {
         return $this->entities;
+    }
+
+    public function getExpectedTotalItemSum(): ?int
+    {
+        return $this->expectedTotalItemSum;
+    }
+
+    public function getExpectedPageItemSum(): ?int
+    {
+        return $this->expectedPageItemSum;
+    }
+
+    public function getExpectedCurrentPage(): ?int
+    {
+        return $this->expectedCurrentPage;
     }
 }
