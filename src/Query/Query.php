@@ -117,7 +117,7 @@ class Query
         $this->setSort($sort);
     }
 
-    public function getResult()
+    public function getResult(bool $single = false)
     {
         foreach ($this->connections as $connection) {
             $result = $connection->handleQuery($this);
@@ -125,26 +125,34 @@ class Query
             if (is_null($result)) {
                 continue;
             }
-            
-            $expectedTotalSum = $connection instanceof PaginatedConnectionInterface ? $connection->getTotalResultsSum() : null;
-            $expectedPageSum = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPageResultsSum() : null;
-            $expectedCurrentPage = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPage() : null;
 
-            if (is_array($result)) {
-                $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0)
-                        ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection([], $expectedTotalSum, $expectedPageSum, $expectedCurrentPage);
+            if ($single) {
+                $entityData = is_array($result) ? reset($result) : $result;
 
-                foreach ($result as $singleResult) {
+                return $this->buildEntity($entityData);
+            } else {
+                $expectedTotalSum = $connection instanceof PaginatedConnectionInterface ? $connection->getTotalResultsSum() : null;
+                $expectedPageSum = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPageResultsSum() : null;
+                $expectedCurrentPage = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPage() : null;
+
+                $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0) ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection([], $expectedTotalSum, $expectedPageSum, $expectedCurrentPage);
+
+                $entityData = is_array($result) ? $result : array($result);
+
+                foreach ($entityData as $singleResult) {
                     $entityCollection[] = $this->buildEntity($singleResult);
                 }
 
                 return $entityCollection;
-            } else {
-                return $this->buildEntity($result);
             }
         }
 
-        return null;
+        return $single ? null : new EntityCollection;
+    }
+
+    public function getSingleResult()
+    {
+        return $this->getResult(true);
     }
 
     private function buildEntity($entityData)
