@@ -72,13 +72,14 @@ class EntityRepository implements RepositoryInterface
             ->get($this->entityClass)
             ->where([$identifierField => $id])
             ->getQuery()
-            ->getResult();
+            ->getSingleResult();
     }
 
     public function findAll($offset = 0, $limit = null)
     {
         return $this->getQueryBuilder()
             ->get($this->entityClass)
+            ->page($page, $limit)
             ->getQuery()
             ->getResult();
     }
