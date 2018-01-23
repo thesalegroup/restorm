@@ -71,6 +71,13 @@ class EntityCollection implements \ArrayAccess, \Iterator
             $this->entities[] = $entity;
         }
     }
+    
+    public function removeEntity($entity)
+    {
+        if($key = array_search($entity, $this->entities, true)) {
+            $this->offsetUnset($key);
+        }
+    }
 
     public function current()
     {
