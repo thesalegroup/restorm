@@ -30,7 +30,7 @@ namespace TheSaleGroup\Restorm;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class EntityCollection implements \ArrayAccess, \Iterator
+class EntityCollection implements \ArrayAccess, \Iterator, \Countable
 {
     /**
      *
@@ -136,6 +136,11 @@ class EntityCollection implements \ArrayAccess, \Iterator
     public function contains($entity): bool
     {
         return in_array($entity, $this->entities);
+    }
+
+    public function count(): int
+    {
+        return count($this->entities);
     }
 
     public function toArray(): array
