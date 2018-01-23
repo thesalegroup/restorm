@@ -62,15 +62,17 @@ class EntityRepository implements RepositoryInterface
             ->getResult();
     }
 
-    public function findOne($id)
+    public function findOne($filter)
     {
         $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($this->entityClass);
         
-        $identifierField = $entityMapping->getIdentifierName();
+        // Filter can be either an ID or an array of filters. Ensure that it's
+        // an array for the where statement
+        $query = is_array($filter) ? $filter : [$entityMapping->getIdentifierName() => $filter];
         
         return $this->getQueryBuilder()
             ->get($this->entityClass)
-            ->where([$identifierField => $id])
+            ->where($query)
             ->getQuery()
             ->getSingleResult();
     }
