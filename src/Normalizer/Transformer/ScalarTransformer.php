@@ -47,6 +47,10 @@ class ScalarTransformer implements TransformerInterface
 
     private function bidirectionalNormalize($value, array $options)
     {
+        if ($value === null){
+            return null;
+        }
+
         if ($options['multiple'] ?? false) {
             if (!is_array($value)) {
                 throw new InvalidValueException('The value passed to the transformer must be an array if option "multiple" is true.');
