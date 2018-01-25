@@ -77,11 +77,10 @@ class EntityRepository implements RepositoryInterface
             ->getSingleResult();
     }
 
-    public function findAll($offset = 0, $limit = null)
+    public function findAll()
     {
         return $this->getQueryBuilder()
             ->get($this->entityClass)
-            ->page($page, $limit)
             ->getQuery()
             ->getResult();
     }

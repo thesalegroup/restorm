@@ -30,24 +30,11 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class FloatTransformer implements TransformerInterface
+class FloatTransformer extends ScalarTransformer
 {
 
-    public function denormalize($value, array $options)
+    protected function getExplicitType(): ?string
     {
-        if ($value === null) {
-            return null;
-        }
-
-        return (float) $value;
-    }
-
-    public function normalize($value, array $options)
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return (float) $value;
+        return 'float';
     }
 }

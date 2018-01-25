@@ -30,24 +30,11 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class IntegerTransformer implements TransformerInterface
+class IntegerTransformer extends ScalarTransformer
 {
 
-    public function denormalize($value, array $options)
+    protected function getExplicitType(): ?string
     {
-        if ($value === null) {
-            return null;
-        }
-
-        return (int) $value;
-    }
-
-    public function normalize($value, array $options)
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return (int) $value;
+        return 'integer';
     }
 }
