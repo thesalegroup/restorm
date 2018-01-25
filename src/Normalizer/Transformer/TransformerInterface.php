@@ -32,7 +32,8 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
  */
 interface TransformerInterface
 {
+
     public function normalize($value, array $options);
-    
+
     public function denormalize($value, array $options);
 }

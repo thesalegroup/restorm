@@ -32,6 +32,7 @@ namespace TheSaleGroup\Restorm\Normalizer\Transformer;
  */
 class TextTransformer extends ScalarTransformer
 {
+
     protected function getExplicitType(): ?string
     {
         return 'string';
