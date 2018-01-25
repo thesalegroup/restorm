@@ -39,5 +39,5 @@ interface RepositoryInterface
 
     public function findOne($id);
 
-    public function findAll($offset = 0, $limit = null);
+    public function findAll();
 }

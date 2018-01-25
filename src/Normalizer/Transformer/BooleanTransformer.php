@@ -2,24 +2,10 @@
 
 namespace TheSaleGroup\Restorm\Normalizer\Transformer;
 
-class BooleanTransformer implements TransformerInterface
+class BooleanTransformer extends ScalarTransformer
 {
-
-    public function normalize($value, array $options)
+    protected function getExplicitType(): ?string
     {
-        if ($value === null) {
-            return null;
-        }
-
-        return (boolean) $value;
-    }
-
-    public function denormalize($value, array $options)
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return (boolean) $value;
+        return 'boolean';
     }
 }
