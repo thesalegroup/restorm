@@ -1,4 +1,5 @@
 <?php
+
 /*
  * The MIT License
  *
@@ -36,8 +37,8 @@ use TheSaleGroup\Restorm\Connection\PaginatedConnectionInterface;
  *
  * @author Rob Treacy <robert.treacy@thesalegroup.co.uk>
  */
-class Query
-{
+class Query {
+
     // Method constants
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
@@ -103,8 +104,7 @@ class Query
      */
     private $entityClass;
 
-    public function __construct(array $connections, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = [])
-    {
+    public function __construct(array $connections, EntityBuilder $entityBuilder, string $entityClass, string $path, string $method, $data, array $filter = [], int $page = 0, int $perPage = 0, array $sort = []) {
         $this->connections = $connections;
         $this->entityBuilder = $entityBuilder;
         $this->entityClass = $entityClass;
@@ -117,8 +117,7 @@ class Query
         $this->setSort($sort);
     }
 
-    public function getResult(bool $single = false)
-    {
+    public function getResult(bool $single = false) {
         foreach ($this->connections as $connection) {
             $result = $connection->handleQuery($this);
 
@@ -128,6 +127,11 @@ class Query
 
             if ($single) {
                 $entityData = is_array($result) ? reset($result) : $result;
+
+                // If the data was an empty array, give up
+                if ($entityData === false) {
+                    continue;
+                }
 
                 return $this->buildEntity($entityData);
             } else {
@@ -150,98 +154,80 @@ class Query
         return $single ? null : new EntityCollection;
     }
 
-    public function getSingleResult()
-    {
+    public function getSingleResult() {
         return $this->getResult(true);
     }
 
-    private function buildEntity($entityData)
-    {
+    private function buildEntity($entityData) {
         return $this->entityBuilder->buildEntity($this->entityClass, $entityData);
     }
 
-    public function getMethod()
-    {
+    public function getMethod() {
         return $this->method;
     }
 
-    public function getData()
-    {
+    public function getData() {
         return $this->data;
     }
 
-    public function getFilter()
-    {
+    public function getFilter() {
         return $this->filter;
     }
 
-    public function getSort()
-    {
+    public function getSort() {
         return $this->sort;
     }
 
-    public function getPage()
-    {
+    public function getPage() {
         return $this->page;
     }
 
-    public function getPerPage()
-    {
+    public function getPerPage() {
         return $this->perPage;
     }
 
-    public function getPath()
-    {
+    public function getPath() {
         return $this->path;
     }
 
-    public function getHeaders()
-    {
+    public function getHeaders() {
         return $this->headers;
     }
 
-    public function setMethod($method)
-    {
+    public function setMethod($method) {
         $this->method = $method;
     }
 
-    public function setData($data)
-    {
+    public function setData($data) {
         $this->data = $data;
     }
 
-    public function setFilter($filter)
-    {
+    public function setFilter($filter) {
         $this->filter = $filter;
     }
 
-    public function setSort($sort)
-    {
+    public function setSort($sort) {
         $this->sort = $sort;
     }
 
-    public function setPage($page)
-    {
+    public function setPage($page) {
         $this->page = $page;
     }
 
-    public function setPerPage($perPage)
-    {
+    public function setPerPage($perPage) {
         $this->perPage = $perPage;
     }
 
-    public function setPath($path)
-    {
+    public function setPath($path) {
         $this->path = $path;
     }
 
-    public function setHeader($key, $value)
-    {
+    public function setHeader($key, $value) {
         $this->headers[$key] = $value;
     }
 
-    public function getEntityClass()
-    {
+    public function getEntityClass() {
         return $this->entityClass;
     }
+
 }
