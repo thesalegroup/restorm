@@ -100,7 +100,7 @@ class EntityTransformer implements AdvancedTransformerInterface
     private function buildEntity(EntityMapping $entityMapping, $identifierValue)
     {
         $entityClass = $entityMapping->getEntityClass();
-        $identifierName = $entityMapping->getIdentifierName();
+        $identifierName = $entityMapping->getIdentifierMappedFromName();
 
         $data = (object) [$identifierName => $identifierValue];
 

@@ -91,6 +91,13 @@ class EntityMapping
         return $this->identifier;
     }
 
+    public function getIdentifierMappedFromName()
+    {
+        $identifierName = $this->getIdentifierName();
+        
+        return $this->properties[$identifierName]['map_from'] ?? $identifierName;
+    }
+
     public function getpath($method)
     {
         return $this->paths[$method];

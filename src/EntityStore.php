@@ -160,6 +160,6 @@ class EntityStore implements EventSubscriberInterface
     {
         $entityMapping = $this->entityMappingRegister->getEntityMapping($entityClass);
 
-        return $entityMapping->getIdentifierName();
+        return $entityMapping->getIdentifierMappedFromName();
     }
 }

@@ -164,7 +164,7 @@ class QueryBuilder
 
     private function getEndpoint()
     {
-        $identifierName = $this->entityMapping->getIdentifierName();
+        $identifierName = $this->entityMapping->getIdentifierMappedFromName();
         $isSingle = is_object($this->entity) || array_key_exists($identifierName, $this->filter);
 
         switch (true) {
