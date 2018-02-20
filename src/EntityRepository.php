@@ -68,7 +68,7 @@ class EntityRepository implements RepositoryInterface
         
         // Filter can be either an ID or an array of filters. Ensure that it's
         // an array for the where statement
-        $query = is_array($filter) ? $filter : [$entityMapping->getIdentifierName() => $filter];
+        $query = is_array($filter) ? $filter : [$entityMapping->getIdentifierMappedFromName() => $filter];
         
         return $this->getQueryBuilder()
             ->get($this->entityClass)
