@@ -29,6 +29,7 @@ use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Normalizer\Exception\InvalidValueException;
 use TheSaleGroup\Restorm\Mapping\EntityMapping;
 use TheSaleGroup\Restorm\EntityCollection;
+use TheSaleGroup\Restorm\Entity\EntityMetadata;
 
 /**
  * Description of EntityTransformer
@@ -59,14 +60,14 @@ class EntityTransformer implements AdvancedTransformerInterface
             $entities = array();
 
             foreach ($value as $entityIdentifierValue) {
-                $entity = $this->buildEntity($entityMapping, $entityIdentifierValue);
+                $entity = $this->buildEntity($entityMapping, $entityIdentifierValue, $options['inline'] ?? false);
                 $entities[] = $entity;
             }
 
             return new EntityCollection($entities);
         } else {
 
-            $entity = $this->buildEntity($entityMapping, $value, true);
+            $entity = $this->buildEntity($entityMapping, $value, $options['inline'] ?? false);
             return $entity;
         }
     }
@@ -83,12 +84,12 @@ class EntityTransformer implements AdvancedTransformerInterface
             }
             $entityValues = array();
             foreach ($value as $entity) {
-                $entityValues[] = $this->getEntityIdentifierValue($entity);
+                $entityValues[] = $options['inline'] ?? false ? $this->getNormalizedEntity($entity) : $this->getEntityIdentifierValue($entity);
             }
 
             return $entityValues;
         } else {
-            return $this->getEntityIdentifierValue($value);
+            return $options['inline'] ?? false ? $this->getNormalizedEntity($value) : $this->getEntityIdentifierValue($value);
         }
     }
 
@@ -97,14 +98,30 @@ class EntityTransformer implements AdvancedTransformerInterface
         $this->entityManager = $entityManager;
     }
 
-    private function buildEntity(EntityMapping $entityMapping, $identifierValue)
+    private function buildEntity(EntityMapping $entityMapping, $entityData, bool $isInlineEntity = false)
     {
         $entityClass = $entityMapping->getEntityClass();
         $identifierName = $entityMapping->getIdentifierMappedFromName();
 
-        $data = (object) [$identifierName => $identifierValue];
+        $data = $isInlineEntity ? $entityData : (object) [$identifierName => $entityData];
 
-        return $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, true);
+        return $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, !$isInlineEntity);
+    }
+    
+    private function getNormalizedEntity($entity)
+    {
+        $entityMetadataRegister = $this->entityManager->getEntityMetadataRegister();
+
+        $entityMetadata = $entityMetadataRegister->getEntityMetadata($entity);
+        
+        if(!$entityMetadata) {
+            $entityMappingRegister = $this->entityManager->getEntityMappingRegister();
+
+            $entityMetadata = new EntityMetadata($entity, $entityMappingRegister->getEntityMapping(get_class($entity)));
+            $entityMetadataRegister->addEntityMetadata($entityMetadata);
+        }
+
+        return $this->entityManager->getNormalizer()->normalize($entityMetadata);
     }
 
     private function getEntityIdentifierValue($entity)
