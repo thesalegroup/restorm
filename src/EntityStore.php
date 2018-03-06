@@ -1,4 +1,5 @@
 <?php
+
 /*
  * The MIT License
  *
@@ -42,6 +43,7 @@ use TheSaleGroup\Restorm\Mapping\Exception\UnknownEntityException;
  */
 class EntityStore implements EventSubscriberInterface
 {
+
     /**
      * @var EntityMappingRegister
      */
@@ -87,6 +89,11 @@ class EntityStore implements EventSubscriberInterface
 
     public function cacheEntityData(PreBuildEvent $event)
     {
+        // Do not attempt to cache entities that are inline
+        if (!$this->entityMappingRegister->getEntityMapping($event->getEntityClass())->hasIdentifier()) {
+            return;
+        }
+
         $entityIdentifierName = $this->getEntityIdentifierName($event->getEntityClass());
 
         $identifier = $event->getData()->$entityIdentifierName;
@@ -102,6 +109,11 @@ class EntityStore implements EventSubscriberInterface
             return;
         }
 
+        // Do not attempt to cache entities that are inline
+        if (!$this->entityMappingRegister->getEntityMapping($event->getEntityClass())->hasIdentifier()) {
+            return;
+        }
+
         $entityIdentifierName = $this->getEntityIdentifierName($event->getEntityClass());
 
         $identifier = $event->getData()->$entityIdentifierName;
@@ -114,6 +126,11 @@ class EntityStore implements EventSubscriberInterface
     public function cacheEntity(PopulatedEntityEventInterface $event)
     {
         $entityClass = $event->getEntityClass();
+
+        // Do not attempt to cache entities that are inline
+        if (!$this->entityMappingRegister->getEntityMapping($entityClass)->hasIdentifier()) {
+            return;
+        }
 
         if (!$this->entityMetadataRegister->getEntityMetadata($event->getEntity())) {
             $entityMetadata = new EntityMetadata($event->getEntity(), $this->entityMappingRegister->getEntityMapping($entityClass));
@@ -145,8 +162,7 @@ class EntityStore implements EventSubscriberInterface
             throw new UnknownEntityException(get_class($entity));
         }
 
-        return $this->entityData[$entityMapping->getEntityClass()][$this->getEntityIdentifier($entity)]
-            ?? null;
+        return $this->entityData[$entityMapping->getEntityClass()][$this->getEntityIdentifier($entity)] ?? null;
     }
 
     private function getEntityIdentifier($entity)
@@ -162,4 +178,5 @@ class EntityStore implements EventSubscriberInterface
 
         return $entityMapping->getIdentifierMappedFromName();
     }
+
 }

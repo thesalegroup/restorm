@@ -183,6 +183,11 @@ class EntityManager
         return $this->proxyFactory;
     }
 
+    function getNormalizer(): Normalizer
+    {
+        return $this->normalizer;
+    }
+
     public function persist($entity)
     {
         $entityMapping = $this->entityMappingRegister->findEntityMapping($entity);

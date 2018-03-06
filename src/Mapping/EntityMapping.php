@@ -51,7 +51,7 @@ class EntityMapping
      */
     private $identifier;
 
-    public function __construct(string $entityClass, string $repositoryName, array $properties, array $paths, string $connection)
+    public function __construct(string $entityClass, ?string $repositoryName, array $properties, ?array $paths, ?string $connection)
     {
         $this->entityClass = $entityClass;
         $this->repositoryName = $repositoryName;
@@ -65,7 +65,7 @@ class EntityMapping
         return $this->entityClass;
     }
 
-    public function getRepositoryName(): string
+    public function getRepositoryName(): ?string
     {
         return $this->repositoryName;
     }
@@ -89,6 +89,11 @@ class EntityMapping
         }
 
         return $this->identifier;
+    }
+    
+    public function hasIdentifier(): bool
+    {
+        return is_string($this->getIdentifierName());
     }
 
     public function getIdentifierMappedFromName()
