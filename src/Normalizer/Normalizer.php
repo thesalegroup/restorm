@@ -1,4 +1,5 @@
 <?php
+
 /*
  * The MIT License
  *
@@ -37,6 +38,7 @@ use TheSaleGroup\Restorm\Entity\EntityMetadata;
  */
 class Normalizer
 {
+
     /**
      * @var TransformerInterface[]
      */
@@ -67,20 +69,7 @@ class Normalizer
 
             if ($propertyType === 'object') {
 
-                if ($propertyValue === null) {
-                    $normalizedValue = null;
-                } else {
-                    $normalizedValue = new \stdClass;
-
-                    foreach ($propertyValue as $dataName => $dataValue) {
-                        $dataType = $this->inferType($dataValue);
-
-                        $transformer = $this->getTransformer($dataType);
-                        $normalizedDataValue = $transformer->normalize($dataValue, []);
-
-                        $normalizedValue->$dataName = $normalizedDataValue;
-                    }
-                }
+                $normalizedValue = $this->normalizeObject($propertyValue);
             } else {
 
                 $transformer = $this->getTransformer($propertyType);
@@ -113,20 +102,7 @@ class Normalizer
 
             if ($propertyType === 'object') {
 
-                if ($propertyValue === null) {
-                    $denormalizedValue = null;
-                } else {
-                    $denormalizedValue = array();
-
-                    foreach ($propertyValue as $dataName => $dataValue) {
-                        $dataType = $this->inferType($dataValue);
-
-                        $transformer = $this->getTransformer($dataType);
-                        $denormalizedDataValue = $transformer->denormalize($dataValue, []);
-
-                        $denormalizedValue[$dataName] = $denormalizedDataValue;
-                    }
-                }
+                $denormalizedValue = $this->denormalizeObject($propertyValue);
             } else {
 
                 $transformer = $this->getTransformer($propertyType);
@@ -158,8 +134,62 @@ class Normalizer
                 return $type;
             case 'double':
                 return 'float';
+            case 'object':
+            case 'array':
+                return 'object';
             default:
                 throw new Exception\UnknownPropertyTypeException;
         }
     }
+
+    private function normalizeObject($value)
+    {
+        if ($value === null) {
+            return null;
+        } else {
+            $normalizedValue = new \stdClass;
+
+            foreach ($value as $dataName => $dataValue) {
+                $dataType = $this->inferType($dataValue);
+
+                if ($dataType === 'object') {
+                    $normalizedValue->$dataName = $this->normalizeObject($dataValue);
+                } else {
+
+                    $transformer = $this->getTransformer($dataType);
+                    $normalizedDataValue = $transformer->normalize($dataValue, []);
+
+                    $normalizedValue->$dataName = $normalizedDataValue;
+                }
+            }
+        }
+
+        return $normalizedValue;
+    }
+
+    private function denormalizeObject($value)
+    {
+        if ($value === null) {
+            return null;
+        } else {
+            $denormalizedValue = array();
+
+            foreach ($value as $dataName => $dataValue) {
+                $dataType = $this->inferType($dataValue);
+
+                if ($dataType === 'object') {
+                    $denormalizedValue[$dataName] = $this->denormalizeObject($dataValue);
+                } else {
+
+                    $transformer = $this->getTransformer($dataType);
+                    $denormalizedDataValue = $transformer->denormalize($dataValue, []);
+
+                    $denormalizedValue[$dataName] = $denormalizedDataValue;
+                }
+            }
+        }
+
+        return $denormalizedValue;
+    }
+
 }
