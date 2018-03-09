@@ -46,7 +46,7 @@ class EntityTransformer implements AdvancedTransformerInterface
     public function denormalize($value, array $options)
     {
         if ($value === null) {
-            return null;
+            return $options['multiple'] ?? false ? new EntityCollection : null;
         }
 
         $entityClass = $options['entity'];
