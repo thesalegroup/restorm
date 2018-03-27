@@ -137,6 +137,8 @@ class Normalizer
             case 'object':
             case 'array':
                 return 'object';
+            case 'NULL':
+                return 'string';
             default:
                 throw new Exception\UnknownPropertyTypeException;
         }
