@@ -118,6 +118,8 @@ class Proxy implements EventSubscriberInterface
 
     private function getPropertyProxyName(string $entityClass, string $property): string
     {
-        return sprintf("\0%s\0%s", $entityClass, $property);
+        $reflectionProperty = new \ReflectionProperty($entityClass, $property);
+
+        return $reflectionProperty->getDeclaringClass()->getName() === $entityClass ? sprintf("\0%s\0%s", $entityClass, $property) : sprintf("\0*\0%s", $property);
     }
 }
