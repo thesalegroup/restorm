@@ -126,6 +126,8 @@ class EntityTransformer implements AdvancedTransformerInterface
 
     private function getEntityIdentifierValue($entity)
     {
-        return $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity)->getIdentifierValue();
+        $entityMetaData = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity);
+
+        return $entityMetaData ? $entityMetaData->getIdentifierValue() : null;
     }
 }
