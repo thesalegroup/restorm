@@ -124,8 +124,11 @@ class EntityTransformer implements AdvancedTransformerInterface
         return $this->entityManager->getNormalizer()->normalize($entityMetadata);
     }
 
+    //if identifier value does not exist null is now returned to prevent error
     private function getEntityIdentifierValue($entity)
     {
-        return $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity)->getIdentifierValue();
+        $entityMetaData = $this->entityManager->getEntityMetadataRegister()->getEntityMetadata($entity);
+
+        return $entityMetaData ? $entityMetaData->getIdentifierValue() : null;
     }
 }
