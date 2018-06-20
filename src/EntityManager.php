@@ -183,7 +183,7 @@ class EntityManager
         return $this->proxyFactory;
     }
 
-    function getNormalizer(): Normalizer
+    public function getNormalizer(): Normalizer
     {
         return $this->normalizer;
     }
@@ -206,7 +206,7 @@ class EntityManager
         if ($knownState) {
             // Filter only mapped fields
             $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
-            $writableFields = $entityMapping->getWritableFields();            
+            $writableFields = $entityMapping->getWritableFields();
 
             // Get normalised entity
             $currentState = (array) $this->normalizer->normalize($entityMetadata);
@@ -244,20 +244,20 @@ class EntityManager
             ->getQuery()
             ->getResult();
     }
-    
+
     public function remove($entity)
     {
         $entityMetadata = $this->entityMetadataRegister->getEntityMetadata($entity);
-        
+
         if(!$entityMetadata) {
             throw new Exception\UnrecognisedEntityException($entity);
         }
-        
+
         $queryBuilder = new Query\QueryBuilder($this);
         $queryBuilder->delete($entity)
             ->getQuery()
             ->getResult();
-        
+
         $this->entityMetadataRegister->removeEntityMetadata($entityMetadata);
     }
 }
