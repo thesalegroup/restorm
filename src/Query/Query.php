@@ -139,7 +139,7 @@ class Query {
                 $expectedPageSum = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPageResultsSum() : null;
                 $expectedCurrentPage = $connection instanceof PaginatedConnectionInterface ? $connection->getCurrentPage() : null;
 
-                $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0) ? new PaginatedCollection($this, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection([], $expectedTotalSum, $expectedPageSum, $expectedCurrentPage);
+                $entityCollection = $this->page == 0 || ($this->perPage == 0 && $this->page == 0) ? new PaginatedCollection($this, true, $expectedTotalSum, $expectedPageSum, $expectedCurrentPage) : new EntityCollection([], $expectedTotalSum, $expectedPageSum, $expectedCurrentPage);
 
                 $entityData = is_array($result) ? $result : array($result);
 

@@ -85,10 +85,13 @@ class Normalizer
 
     public function denormalize(\stdClass $data, EntityMetadata $entityMetadata, bool $partialData = false)
     {
+        $identifierName = $entityMetadata->getEntityMapping()->getIdentifierName();
+        $identifierValue = $data->$identifierName;
+
         foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
-            if (!property_exists($data, $mapFrom)) {
+            if (!property_exists($data, $mapFrom) && !($propertyOptions['inverse_field'] ?? false)) {
 
                 if ($partialData) {
                     continue;
@@ -98,7 +101,7 @@ class Normalizer
             }
 
             $propertyType = $propertyOptions['type'];
-            $propertyValue = $data->$mapFrom;
+            $propertyValue = ($propertyOptions['inverse_field'] ?? false) ? null : $data->$mapFrom;
 
             if ($propertyType === 'object') {
 
@@ -106,6 +109,10 @@ class Normalizer
             } else {
 
                 $transformer = $this->getTransformer($propertyType);
+
+                if($transformer instanceof AdvancedTransformerInterface) {
+                    $transformer->setEntityIdentifierValue($identifierValue);
+                }
 
                 $denormalizedValue = $transformer->denormalize($propertyValue, $propertyOptions);
             }

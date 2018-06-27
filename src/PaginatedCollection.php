@@ -38,13 +38,19 @@ class PaginatedCollection extends EntityCollection
      * @var Query
      */
     private $originalQuery;
+
+    /**
+     * @var bool Whether the original query has been used or not yet.
+     */
+    private $isInitialized;
     private $previousPage;
 
-    public function __construct(Query $query, ?int $totalItemSum = null, ?int $pageItemSum = null, ?int $currentPage = null)
+    public function __construct(Query $query, bool $isInitialized, ?int $totalItemSum = null, ?int $pageItemSum = null, ?int $currentPage = null)
     {
         $this->originalQuery = $query;
+        $this->isInitialized = $isInitialized;
         $this->previousPage = $query->getPage() ?: 1;
-        
+
         parent::__construct([], $totalItemSum, $pageItemSum, $currentPage);
     }
 
@@ -57,7 +63,22 @@ class PaginatedCollection extends EntityCollection
         $nextPageQuery = clone $this->originalQuery;
         $nextPageQuery->setPage($this->previousPage + 1);
 
-        $entityCollection = $nextPageQuery->getResult();
+        $this->populateEntitiesFromQuery($nextPageQuery);
+    }
+
+    public function valid(): bool
+    {
+        if(!$this->isInitialized) {
+            $this->populateEntitiesFromQuery($this->originalQuery);
+            $this->isInitialized = true;
+        }
+
+        return parent::valid();
+    }
+
+    private function populateEntitiesFromQuery(Query $query)
+    {
+        $entityCollection = $query->getResult();
 
         if (!$entityCollection) {
             return;
