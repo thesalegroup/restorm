@@ -29,7 +29,9 @@ use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Normalizer\Exception\InvalidValueException;
 use TheSaleGroup\Restorm\Mapping\EntityMapping;
 use TheSaleGroup\Restorm\EntityCollection;
+use TheSaleGroup\Restorm\PaginatedCollection;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\Query\QueryBuilder;
 
 /**
  * Description of EntityTransformer
@@ -43,9 +45,14 @@ class EntityTransformer implements AdvancedTransformerInterface
      */
     private $entityManager;
 
+    /**
+     * @var mixed
+     */
+    private $identifierValue;
+
     public function denormalize($value, array $options)
     {
-        if ($value === null) {
+        if ($value === null && !$options['inverse_field'] ?? false) {
             return $options['multiple'] ?? false ? new EntityCollection : null;
         }
 
@@ -53,6 +60,18 @@ class EntityTransformer implements AdvancedTransformerInterface
         $entityMapping = $this->entityManager->getEntityMappingRegister()->getEntityMapping($entityClass);
 
         if ($options['multiple'] ?? false) {
+
+            if($options['inverse_field'] ?? false) {
+                $queryBuilder = new QueryBuilder($this->entityManager);
+                $query = $queryBuilder->get($entityClass)
+                    ->where([
+                        $options['inverse_field'] => $this->identifierValue,
+                    ])
+                    ->getQuery();
+
+                return new PaginatedCollection($query, false);
+            }
+
             if (!is_array($value)) {
                 throw new InvalidValueException('The value passed to the entity transformer must be an array if option "multiple" is true.');
             }
@@ -98,6 +117,11 @@ class EntityTransformer implements AdvancedTransformerInterface
         $this->entityManager = $entityManager;
     }
 
+    public function setEntityIdentifierValue($identifierValue): void
+    {
+        $this->identifierValue = $identifierValue;
+    }
+
     private function buildEntity(EntityMapping $entityMapping, $entityData, bool $isInlineEntity = false)
     {
         $entityClass = $entityMapping->getEntityClass();
@@ -107,13 +131,13 @@ class EntityTransformer implements AdvancedTransformerInterface
 
         return $this->entityManager->getEntityBuilder()->buildEntity($entityClass, $data, !$isInlineEntity);
     }
-    
+
     private function getNormalizedEntity($entity)
     {
         $entityMetadataRegister = $this->entityManager->getEntityMetadataRegister();
 
         $entityMetadata = $entityMetadataRegister->getEntityMetadata($entity);
-        
+
         if(!$entityMetadata) {
             $entityMappingRegister = $this->entityManager->getEntityMappingRegister();
 

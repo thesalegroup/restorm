@@ -34,4 +34,6 @@ use TheSaleGroup\Restorm\EntityManager;
 interface AdvancedTransformerInterface extends TransformerInterface
 {
     public function setEntityManager(EntityManager $entityManager): void;
+
+    public function setEntityIdentifierValue($identifierValue): void;
 }
