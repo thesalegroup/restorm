@@ -52,7 +52,7 @@ class EntityTransformer implements AdvancedTransformerInterface
 
     public function denormalize($value, array $options)
     {
-        if ($value === null && !$options['inverse_field'] ?? false) {
+        if ($value === null && !($options['inverse_field'] ?? false)) {
             return $options['multiple'] ?? false ? new EntityCollection : null;
         }
 
