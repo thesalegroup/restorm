@@ -44,10 +44,6 @@ use TheSaleGroup\Restorm\Event\PrePersistEvent;
  */
 class EntityManager
 {
-    /**
-     * @var EntityManager
-     */
-    private static $instance;
 
     /**
      *
@@ -125,7 +121,7 @@ class EntityManager
 
     public static function createFromConfiguration(Configuration $configuration): EntityManager
     {
-        return self::$instance = new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getDataTransformers(), $configuration->getEventDispatcher());
+        return new EntityManager($configuration->getEntityMappingRegister(), $configuration->getConnectionRegister(), $configuration->getDataTransformers(), $configuration->getEventDispatcher());
     }
 
     public function getRepository($entity): EntityRepository
