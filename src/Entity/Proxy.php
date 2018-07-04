@@ -80,7 +80,10 @@ class Proxy implements EventSubscriberInterface
             if (!property_exists($event->getData(), $dataPropertyName)) {
 
                 $propertyKey = array_search($propertyName, $properties);
-                if (is_int($propertyKey)) {
+
+                // Remove properties from the skipped properties list if they're
+                // not already set or if they're an inverse_field
+                if (is_int($propertyKey) && !($propertyOptions['inverse_field'] ?? false)) {
                     unset($properties[$propertyKey]);
                 }
 
@@ -93,6 +96,7 @@ class Proxy implements EventSubscriberInterface
         foreach ($properties as $property) {
             $proxyOptions['skippedProperties'][] = $this->getPropertyProxyName($event->getEntityClass(), $property);
         }
+
 
         $initializer = function (
             GhostObjectInterface $ghostObject,
