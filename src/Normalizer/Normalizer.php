@@ -62,6 +62,12 @@ class Normalizer
         $writableProperties = $entityMetadata->getWritableProperties();
 
         foreach ($writableProperties as $propertyName => $propertyOptions) {
+
+            // Ignore inverse fields
+            if ($propertyOptions['inverse_field'] ?? false) {
+                continue;
+            }
+
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
 
             $propertyType = $propertyOptions['type'];
