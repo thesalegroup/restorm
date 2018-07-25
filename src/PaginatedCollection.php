@@ -90,4 +90,32 @@ class PaginatedCollection extends EntityCollection
             $this->entities[] = $entity;
         }
     }
+
+    /**
+     * Get the count of entities.
+     * 
+     * Calling this method will force initialisation of this object and call
+     * each page of content.
+     * 
+     * @return integer the count of entities.
+     * 
+     * @author Rob Treacy <erobert.treacy@thesalegroup.co.uk>
+     */
+    public function count(): int
+    {
+        // If the count is already set, return it
+        if(!is_null($this->count)) {
+            return $this->count;
+        }
+
+        // Maually create a count by looping through the entities. This will
+        // trigger the pagination calls to get the correct count of entities
+        $count = 0;
+        foreach($this as $entity) {
+            $count++;
+        }
+
+        $this->count = $count;
+        return $count;
+    }
 }
