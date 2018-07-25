@@ -45,6 +45,11 @@ class PaginatedCollection extends EntityCollection
     private $isInitialized;
     private $previousPage;
 
+    /**
+     * @var integer the count of entities in this collection.
+     */
+    private $count;
+
     public function __construct(Query $query, bool $isInitialized, ?int $totalItemSum = null, ?int $pageItemSum = null, ?int $currentPage = null)
     {
         $this->originalQuery = $query;
