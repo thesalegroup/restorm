@@ -30,6 +30,7 @@ use TheSaleGroup\Restorm\EntityManager;
 use TheSaleGroup\Restorm\Normalizer\Transformer\TransformerInterface;
 use TheSaleGroup\Restorm\Normalizer\Transformer\AdvancedTransformerInterface;
 use TheSaleGroup\Restorm\Entity\EntityMetadata;
+use TheSaleGroup\Restorm\PaginatedCollection;
 
 /**
  * Description of Normalizer
@@ -104,6 +105,11 @@ class Normalizer
                 } else {
                     throw new Exception\MissingPropertyException(sprintf('Property "%s" was not available in the data.', $mapFrom));
                 }
+            }
+
+            // Do not overwrite existing inverse field properties
+            if (($propertyOptions['inverse_field'] ?? false) && $entityMetadata->getPropertyValue($propertyName) instanceof PaginatedCollection) {
+                continue;
             }
 
             $propertyType = $propertyOptions['type'];
