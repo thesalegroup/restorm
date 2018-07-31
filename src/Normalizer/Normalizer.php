@@ -93,7 +93,6 @@ class Normalizer
     public function denormalize(\stdClass $data, EntityMetadata $entityMetadata, bool $partialData = false)
     {
         $identifierName = $entityMetadata->getEntityMapping()->getIdentifierName();
-        $identifierValue = $data->$identifierName;
 
         foreach ($entityMetadata->getEntityMapping()->getProperties() as $propertyName => $propertyOptions) {
             $mapFrom = $propertyOptions['map_from'] ?? $propertyName;
@@ -122,8 +121,10 @@ class Normalizer
 
                 $transformer = $this->getTransformer($propertyType);
 
-                if($transformer instanceof AdvancedTransformerInterface) {
-                    $transformer->setEntityIdentifierValue($identifierValue);
+                // The data doesn't necessarily have an identifier (eg an inline
+                // object) so only set this value if there is one
+                if($transformer instanceof AdvancedTransformerInterface && $identifierName) {
+                    $transformer->setEntityIdentifierValue($data->$identifierName);
                 }
 
                 $denormalizedValue = $transformer->denormalize($propertyValue, $propertyOptions);
