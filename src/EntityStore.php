@@ -142,9 +142,11 @@ class EntityStore implements EventSubscriberInterface
         foreach ($pendingChanges as $fieldName => $fieldValue) {
             $dataKey = $entityMapping->getProperties()[$fieldName]['map_from'] ?? $fieldName;
 
-            // Only preserve the pending value if it's scalar. Objects cause a
-            // difficulty that won't be solved now.
-            if (!isset($event->getData()->$dataKey) || !is_scalar($fieldValue)) {
+            // Only preserve the pending value if it's scalar or an entity. Arrays
+            // and other objects need speccing before a choice is made here
+            if ($entityMapping->getProperties()[$fieldName]['type'] === 'entity' && $propertyMetadata = $this->entityMetadataRegister->getEntityMetadata($fieldValue)) {
+                $fieldValue = $propertyMetadata->getIdentifierValue();
+            } elseif (!isset($event->getData()->$dataKey) || !is_scalar($fieldValue)) {
                 continue;
             }
 
