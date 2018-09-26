@@ -178,7 +178,7 @@ connection: default
 ```
 
 The value for connection should be one of the configured connections in
-Restorm. This field will tell restorm which connection to use to fetch the
+Restorm. This field will tell RESTORM which connection to use to fetch the
 information.
 
 
@@ -188,14 +188,14 @@ information.
 repository_class: TheSaleGroup\Restorm\EntityRepository
 ```
 
-The repository class tells restorm which repository it should use for fetching
+The repository class tells RESTORM which repository it should use for fetching
 entities. The repository is instanciated by the `EntityManager` and return with
 `EntityManager::getRepository()`. There is no default for this field however
 it's recommended that the internal `EntityRepository` repository be used as it
 provides many generic methods for fetching entities based on IDs or filters. In
 the case that you'd want to provide your own custom method that contain their
 own business logic for fetching entities then you should create your own
-repository class and configure restorm to use that.
+repository class and configure RESTORM to use that.
 
 
 ## Paths
@@ -219,7 +219,7 @@ single resource.
 
 The path itself is allowed to contain placeholders for values of an entity. For
 example if you get a "get" endpoint that requires the "ID" of an entity to be
-included in the path then you can use the parameters syntax to tell restorm to
+included in the path then you can use the parameters syntax to tell RESTORM to
 include that "ID" in the path:
 
 ```
@@ -227,9 +227,9 @@ include that "ID" in the path:
 ```
 
 The parameters syntax works only for endpoint which have a single entity in the
-context of restorm. For example when asking restorm to persist an entity it
+context of RESTORM. For example when asking RESTORM to persist an entity it
 will be within the context of that entity when building the URL. On the other
-hand trying to get a list of entities would put restorm in no particular
+hand trying to get a list of entities would put RESTORM in no particular
 context of that entity as the search filter (if any) will refer to a collection
 of entities instead of one.
 
@@ -238,7 +238,7 @@ Any property of an entity can be used as a parameter in the paths.
 
 ## Properties
 
-The properties list is used by restorm to understand what an entity looks like.
+The properties list is used by RESTORM to understand what an entity looks like.
 Restorm is only aware of the fields of an entity that are defined the
 properties list and will ignore any other property on a class. Properties have
 a name which is used as the key and a list of options within it. The property
@@ -323,13 +323,13 @@ if "map_from" is not set then the property name is presumed.
 #### read_only
 
 A boolean flag to indicate whether the property is read only or not. This will
-prevent restorm from monitoring changes and attempting to update the property's
+prevent RESTORM from monitoring changes and attempting to update the property's
 value. By default this is set to `false`.
 
 
 #### entity
 
-Required when the "type" is set to `entity`. This option informs restorm what
+Required when the "type" is set to `entity`. This option informs RESTORM what
 entity class should be used when populating this property. A fully qualified
 class name that's defined in the "entity_mappings" configuration should be
 given.
