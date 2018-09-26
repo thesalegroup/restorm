@@ -10,6 +10,13 @@ RESTORM provides an entity manager to take care of persisting your entities to
 a REST API.
 
 
+# Documentation Contents
+
+1. [Installation](#installation)
+2. References
+    1. [Configuration Reference](docs/Reference/Configuration.md)
+
+
 # Installation
 
 To install RESTORM, run the following composer command:
