@@ -1,7 +1,9 @@
 # Configuration
 
-The only configuration format currently supported is yaml. Below is a reference
-to the complete configuration currently available.
+The configuration describes the layout of your project to RESTORM and what
+properties of your entities it should handle. The configuration can be included
+as a YAML file or injected as an array. Below is a reference to the complete
+configuration currently available in YAML.
 
 ```YAML
 connections:
