@@ -29,7 +29,9 @@ loading your entities to and from a REST API.
     1. [Create Entities](#create-entities)
     2. [Create Configuration File](#create-configuration-file)
     3. [Initialize Manager](#initialize-manager)
-4. References
+4. Internals
+    1. ["Find" Workflow](docs/Internals/Find.md)
+5. References
     1. [Configuration Reference](docs/Reference/Configuration.md)
 
 
