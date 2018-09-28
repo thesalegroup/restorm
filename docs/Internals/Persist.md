@@ -13,7 +13,7 @@ Persisting an entity results in a write to the entity's connection. In the proce
 5.  Find the difference between the known state and current state of the 
     entity. Transform this data with `Normalizer` into normalized data that can 
     be sent to `Connection` later.
-6.  User `QueryBuilder` to create a `Query` object. `E3ntityManager` will 
+6.  User `QueryBuilder` to create a `Query` object. `EntityManager` will 
     decide whether to use a `POST` or `PATCH` request based on whether the 
     entity is new or known.
 7.  `Query` fetches data from `Connection`.
