@@ -31,6 +31,7 @@ loading your entities to and from a REST API.
     3. [Initialize Manager](#initialize-manager)
 4. Internals
     1. ["Find" Workflow](docs/Internals/Find.md)
+    2. ["Persist" Workflow](docs/Internals/Persist.md)
 5. References
     1. [Configuration Reference](docs/Reference/Configuration.md)
 
