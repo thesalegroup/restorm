@@ -136,7 +136,9 @@ class EntityStore implements EventSubscriberInterface
         $entityMapping = $entityMetadata->getEntityMapping();
 
         // Find the fields that aren't the same as the last known state
-        $pendingChanges = array_diff_assoc($entityMetadata->getWritablePropertyValues(), (array) $this->entityData[$event->getEntityClass()][$entityMetadata->getIdentifierValue()]);
+        $pendingChanges = array_udiff_assoc($entityMetadata->getWritablePropertyValues(), (array) $this->entityData[$event->getEntityClass()][$entityMetadata->getIdentifierValue()], function($a, $b) {
+            return (int) ($a !== $b);
+        });
 
         // Prevent the changes from being overwritten by the build
         foreach ($pendingChanges as $fieldName => $fieldValue) {
